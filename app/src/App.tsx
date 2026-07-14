@@ -59,8 +59,15 @@ function App() {
       {/* Fixed hero sphere canvas */}
       <HeroSphere visible={heroVisible} />
 
-      {/* Gradient overlay for text legibility */}
-      <div className="hero-gradient-overlay" />
+      {/* Gradient overlay for text legibility - only visible during hero */}
+      <div
+        className="hero-gradient-overlay"
+        style={{
+          opacity: heroVisible ? 1 : 0,
+          transition: 'opacity 0.5s ease',
+          pointerEvents: 'none',
+        }}
+      />
 
       {/* Navigation */}
       <Navigation />
