@@ -59,15 +59,14 @@ export default function CTASection() {
       params.append('location', formData.location)
       params.append('problem', formData.problem)
 
-      const res = await fetch(SHEETS_API_URL, {
+      await fetch(SHEETS_API_URL, {
         method: 'POST',
+        mode: 'no-cors', // Crucial: Google Apps Script redirects require this
         body: params,
       })
 
-      if (!res.ok) {
-        throw new Error(`Server responded with status ${res.status}`)
-      }
-
+      // With no-cors, the response is opaque and we can't read res.ok or res.status.
+      // If the fetch doesn't throw a network error, we assume the request went through.
       setStatus('success')
       setFormData({
         name: '',
