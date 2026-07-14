@@ -11,9 +11,7 @@ import HeroSection from './sections/HeroSection'
 import ProductSections from './sections/ProductSection'
 import HowItWorksSection from './sections/HowItWorksSection'
 import LiveConsoleSection from './sections/LiveConsoleSection'
-import DashboardPreviewSection from './sections/DashboardPreviewSection'
 import IntegrationsSection from './sections/IntegrationsSection'
-import TestimonialsSection from './sections/TestimonialsSection'
 import PricingSection from './sections/PricingSection'
 import CTASection from './sections/CTASection'
 
@@ -78,9 +76,7 @@ function App() {
         <ProductSections />
         <HowItWorksSection />
         <LiveConsoleSection />
-        <DashboardPreviewSection />
         <IntegrationsSection />
-        <TestimonialsSection />
         <PricingSection />
         <CTASection />
       </main>

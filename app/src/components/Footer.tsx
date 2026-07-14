@@ -11,9 +11,10 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <a href="#" className="flex items-center gap-2.5 no-underline mb-4">
-              <div
-                className="w-6 h-6 rounded-[4px]"
-                style={{ background: 'linear-gradient(135deg, #2A3FE0, #5A6CFF)' }}
+              <img
+                src="/assets/images/logo.png"
+                alt="wakilz logo"
+                className="h-6 w-auto object-contain"
               />
               <span className="font-display font-bold text-lg" style={{ color: 'var(--text-primary)' }}>
                 wakilz

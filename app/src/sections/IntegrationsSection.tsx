@@ -5,12 +5,18 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 gsap.registerPlugin(ScrollTrigger)
 
 const integrations = [
-  { name: 'WhatsApp', abbr: 'WA' },
-  { name: 'Twilio', abbr: 'TW' },
-  { name: 'Google Calendar', abbr: 'GC' },
-  { name: 'Zapier', abbr: 'ZP' },
-  { name: 'HubSpot', abbr: 'HS' },
-  { name: 'Salesforce', abbr: 'SF' },
+  { name: 'WhatsApp', icon: 'whatsapp.svg', abbr: 'WA' },
+  { name: 'Twilio', icon: 'twilio.svg', abbr: 'TW' },
+  { name: 'Google Calendar', icon: 'googlecalendar.svg', abbr: 'GC' },
+  { name: 'Zapier', icon: 'zapier.svg', abbr: 'ZP' },
+  { name: 'HubSpot', icon: 'hubspot.svg', abbr: 'HS' },
+  { name: 'Salesforce', icon: 'salesforce.svg', abbr: 'SF' },
+  { name: 'Airtable', icon: 'airtable.svg', abbr: 'AT' },
+  { name: 'Calendly', icon: 'calendly.svg', abbr: 'CL' },
+  { name: 'Notion', icon: 'notion.svg', abbr: 'NT' },
+  { name: 'Slack', icon: 'slack.svg', abbr: 'SL' },
+  { name: 'ActiveCampaign', icon: 'activecampaign.svg', abbr: 'AC' },
+  { name: 'Make', icon: 'make.svg', abbr: 'MK' },
 ]
 
 export default function IntegrationsSection() {
@@ -66,10 +72,18 @@ export default function IntegrationsSection() {
             >
               <div className="flex flex-col items-center gap-2">
                 <div
-                  className="w-10 h-10 rounded-md flex items-center justify-center font-mono text-sm font-medium"
-                  style={{ background: 'var(--surface-light)', color: 'var(--text-muted)' }}
+                  className="w-12 h-12 rounded-md flex items-center justify-center p-2.5 transition-colors duration-200 hover:bg-[var(--surface-light)]"
+                  style={{ background: 'var(--surface-light)' }}
                 >
-                  {int.abbr}
+                  <img
+                    src={`/assets/icons/integrations/${int.icon}`}
+                    alt={`${int.name} logo`}
+                    className="w-7 h-7 object-contain filter brightness-110"
+                    onError={(e) => {
+                      // Fallback if image fails to load
+                      (e.target as HTMLElement).style.display = 'none';
+                    }}
+                  />
                 </div>
                 <span className="font-mono text-[11px]" style={{ color: 'var(--text-muted)' }}>
                   {int.name}

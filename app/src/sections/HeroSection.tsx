@@ -51,15 +51,16 @@ export default function HeroSection() {
 
             {/* CTA Row */}
             <div className="flex items-center gap-6 flex-wrap mb-8">
-              <a
-                href="https://calendar.app.google/t6bp5VNVe3BRzBcv7"
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => {
+                  const el = document.getElementById('contact-sales')
+                  if (el) el.scrollIntoView({ behavior: 'smooth' })
+                }}
                 className="btn-primary"
               >
-                Start free trial
+                Connect to Sales
                 <ArrowRight size={16} />
-              </a>
+              </button>
               <button
                 className="btn-secondary font-mono text-sm"
                 onClick={() => {

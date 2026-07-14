@@ -29,9 +29,10 @@ export default function Navigation() {
       <div className="max-w-[1160px] mx-auto px-6 h-full flex items-center justify-between">
         {/* Logo */}
         <a href="#" className="flex items-center gap-2.5 no-underline">
-          <div
-            className="w-6 h-6 rounded-[4px]"
-            style={{ background: 'linear-gradient(135deg, #2A3FE0, #5A6CFF)' }}
+          <img
+            src="/assets/images/logo.png"
+            alt="wakilz logo"
+            className="h-6 w-auto object-contain"
           />
           <span
             className="font-display font-bold text-lg tracking-tight"
@@ -58,20 +59,12 @@ export default function Navigation() {
 
         {/* Right */}
         <div className="hidden md:flex items-center gap-5">
-          <span
-            className="font-mono text-[13px] cursor-pointer transition-colors duration-200 hover:text-[var(--text-primary)]"
-            style={{ color: 'var(--text-secondary)' }}
-          >
-            Log in
-          </span>
-          <a
-            href="https://calendar.app.google/t6bp5VNVe3BRzBcv7"
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            onClick={() => scrollTo('#contact-sales')}
             className="btn-primary text-sm py-2.5 px-5"
           >
-            Start free trial
-          </a>
+            Connect to Sales
+          </button>
         </div>
 
         {/* Mobile menu button */}
@@ -104,14 +97,12 @@ export default function Navigation() {
               </li>
             ))}
             <li className="pt-2">
-              <a
-                href="https://calendar.app.google/t6bp5VNVe3BRzBcv7"
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => scrollTo('#contact-sales')}
                 className="btn-primary text-sm py-2.5 px-5 w-full justify-center"
               >
-                Start free trial
-              </a>
+                Connect to Sales
+              </button>
             </li>
           </ul>
         </div>

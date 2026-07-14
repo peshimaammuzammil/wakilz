@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- Microsoft Teams brand logo -->
+  <!-- Person/Avatar circle -->
+  <circle cx="14.5" cy="5.5" r="3.5" fill="#5059C9"/>
+  <!-- T-shirt / body for person icon -->
+  <path fill="#5059C9" d="M18.68 10H10.32C9.59 10 9 10.59 9 11.32V17a6 6 0 0 0 12 0v-5.68c0-.73-.59-1.32-1.32-1.32z"/>
+  <!-- Chat bubble for second person -->
+  <circle cx="7" cy="6" r="2.5" fill="#7B83EB"/>
+  <path fill="#7B83EB" d="M9.13 10.28A1.5 1.5 0 0 0 9 11.32V17a6 6 0 0 0 .87 3.1A5 5 0 0 1 2 15v-4.45C2 9.69 2.69 9 3.55 9H8a3 3 0 0 1 1.13 1.28z"/>
+</svg>
