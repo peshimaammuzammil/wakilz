@@ -6,7 +6,7 @@ import FluidDistortionField from '../effects/FluidDistortionField'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const SHEETS_API_URL = 'https://script.google.com/a/macros/wakilz.com/s/AKfycbyp8DXU4ASH9rI-MxG935rDdhn3CUbtM0gXeIPM607QcQ4VLBTFwAJYv8g8teA0zsVF1g/exec'
+const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbwwTTKU9HVyLOagFb6hj1YzR9YZiUA1kqkf5tmNucWsqZlWwvfTa-JFCMkkK0tH-sY4qw/exec'
 
 export default function CTASection() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -48,18 +48,26 @@ export default function CTASection() {
     setErrorMessage('')
 
     try {
-      // Send details to Google Sheets Web App
-      await fetch(SHEETS_API_URL, {
+      // Send as URLSearchParams - this is a "simple" CORS request that
+      // Google Apps Script handles natively without needing CORS preflight.
+      // Use e.parameter.fieldName in your Apps Script to read the values.
+      const params = new URLSearchParams()
+      params.append('name', formData.name)
+      params.append('email', formData.email)
+      params.append('phone', formData.phone)
+      params.append('company', formData.company)
+      params.append('location', formData.location)
+      params.append('problem', formData.problem)
+
+      const res = await fetch(SHEETS_API_URL, {
         method: 'POST',
-        mode: 'no-cors', // Crucial to avoid preflight CORS failures with Google Apps Script
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+        body: params,
       })
 
-      // With 'no-cors', we won't get a readable response body, but the network request completes.
-      // We assume success if the fetch did not throw a network error.
+      if (!res.ok) {
+        throw new Error(`Server responded with status ${res.status}`)
+      }
+
       setStatus('success')
       setFormData({
         name: '',
