@@ -6,7 +6,7 @@ import FluidDistortionField from '../effects/FluidDistortionField'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const SHEETS_API_URL = 'https://script.google.com/a/macros/wakilz.com/s/AKfycbx9p4AmEtDXzt7HzRUzDbNRy_zFO8XW4P1GsExGAk28KXS-5Oal1MEDCXgwrCOZsdWu3w/exec'
+const SHEETS_API_URL = 'https://script.google.com/a/macros/wakilz.com/s/AKfycbyp8DXU4ASH9rI-MxG935rDdhn3CUbtM0gXeIPM607QcQ4VLBTFwAJYv8g8teA0zsVF1g/exec'
 
 export default function CTASection() {
   const sectionRef = useRef<HTMLElement>(null)
