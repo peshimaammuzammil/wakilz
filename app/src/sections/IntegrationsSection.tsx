@@ -76,7 +76,7 @@ export default function IntegrationsSection() {
                   style={{ background: 'var(--surface-light)' }}
                 >
                   <img
-                    src={`/assets/icons/integrations/${int.icon}`}
+                    src={`${import.meta.env.BASE_URL}assets/icons/integrations/${int.icon}`}
                     alt={`${int.name} logo`}
                     className="w-7 h-7 object-contain filter brightness-110"
                     onError={(e) => {
