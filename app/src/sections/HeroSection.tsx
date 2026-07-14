@@ -8,7 +8,6 @@ export default function HeroSection() {
 
   return (
     <section className="hero-section relative" style={{ zIndex: 2 }}>
-      <div className="hero-gradient-overlay" />
       <div className="content-container relative" style={{ zIndex: 2 }}>
         <div className="grid grid-cols-1 lg:grid-cols-[55%_45%] gap-8 items-start">
           {/* Left content */}

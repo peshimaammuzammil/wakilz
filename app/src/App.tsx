@@ -58,20 +58,21 @@ function App() {
       <HeroSphere visible={heroVisible} />
 
       {/* Gradient overlay for text legibility - only visible during hero */}
-      <div
-        className="hero-gradient-overlay"
-        style={{
-          opacity: heroVisible ? 1 : 0,
-          transition: 'opacity 0.5s ease',
-          pointerEvents: 'none',
-        }}
-      />
+      {heroVisible && (
+        <div
+          className="hero-gradient-overlay"
+          style={{
+            pointerEvents: 'none',
+            transition: 'opacity 0.5s ease',
+          }}
+        />
+      )}
 
       {/* Navigation */}
       <Navigation />
 
       {/* Main content */}
-      <main className="relative" style={{ zIndex: 2 }}>
+      <main className="relative" style={{ zIndex: 10 }}>
         <HeroSection />
         <ProductSections />
         <HowItWorksSection />
