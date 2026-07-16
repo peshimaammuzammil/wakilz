@@ -30,7 +30,7 @@ export default function Navigation() {
         {/* Logo */}
         <a href="#" className="flex items-center gap-2.5 no-underline">
           <img
-            src={`${import.meta.env.BASE_URL}assets/images/logo.png`}
+            src={`${import.meta.env.BASE_URL}assets/images/logo.png?v=2`}
             alt="wakilz logo"
             className="h-6 w-auto object-contain"
           />

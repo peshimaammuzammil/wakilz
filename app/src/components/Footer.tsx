@@ -12,7 +12,7 @@ export default function Footer() {
           <div className="lg:col-span-1">
             <a href="#" className="flex items-center gap-2.5 no-underline mb-4">
               <img
-                src={`${import.meta.env.BASE_URL}assets/images/logo.png`}
+                src={`${import.meta.env.BASE_URL}assets/images/logo.png?v=2`}
                 alt="wakilz logo"
                 className="h-6 w-auto object-contain"
               />
