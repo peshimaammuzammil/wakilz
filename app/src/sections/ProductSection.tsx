@@ -23,8 +23,8 @@ interface ProductData {
 const products: ProductData[] = [
   {
     module: 'MODULE 01',
-    title: 'Capture every call, in every language.',
-    description: 'Wakilz answers every inbound call and WhatsApp message instantly — in Telugu, Hindi, or English. No missed enquiries, no after-hours voicemail.',
+    title: 'Never let a raw lead go cold.',
+    description: 'Wakilz acts as your tireless pre-sales team, answering every digital inquiry in under 2 seconds. We instantly filter out the junk so your closing team wakes up to qualified opportunities.',
     bg: '#0C1524',
     colors: { color1: [12, 21, 36], color2: [28, 44, 166], color3: [42, 63, 224] },
     seed: 42.7,
@@ -48,8 +48,8 @@ const products: ProductData[] = [
   },
   {
     module: 'MODULE 02',
-    title: 'Qualify buyers before your team dials.',
-    description: 'Budget, timeline, configuration — scored automatically. Your agents only speak to buyers who are ready.',
+    title: 'Qualify leads before your team dials.',
+    description: 'Budget, timeline, inventory configuration — scored automatically based on your specific mandate. Your brokers only speak to high-intent buyers.',
     bg: '#0F1929',
     colors: { color1: [28, 44, 166], color2: [42, 63, 224], color3: [90, 108, 255] },
     seed: 137.3,
@@ -89,8 +89,8 @@ const products: ProductData[] = [
   },
   {
     module: 'MODULE 03',
-    title: 'Book site visits into your calendar.',
-    description: 'Wakilz checks availability and books directly into your team\'s calendar. Confirms over WhatsApp with location and time.',
+    title: 'Book Site Visits (SVs) into your calendar.',
+    description: 'Once qualified, Wakilz automatically checks availability and schedules the Site Visit directly into your sourcing managers\' or closing team\'s calendars. Confirms via WhatsApp.',
     bg: '#0C1524',
     colors: { color1: [12, 21, 36], color2: [31, 122, 77], color3: [79, 190, 135] },
     seed: 231.9,
@@ -120,8 +120,8 @@ const products: ProductData[] = [
   },
   {
     module: 'MODULE 04',
-    title: "Don't stop at the sale.",
-    description: 'Payment reminders, documentation follow-ups, possession updates — handled automatically so your team focuses on new leads.',
+    title: "Post-Sales & Collections Automation.",
+    description: 'The relationship doesn\'t end at booking. Automatically trigger payment reminders, document collection nudges, and possession updates via WhatsApp to keep cash flow moving.',
     bg: '#0F1929',
     colors: { color1: [28, 44, 166], color2: [42, 63, 224], color3: [90, 108, 255] },
     seed: 55.1,

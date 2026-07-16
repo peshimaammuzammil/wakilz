@@ -12,7 +12,7 @@ export default function HeroSection() {
         <div className="grid grid-cols-1 lg:grid-cols-[55%_45%] gap-8 items-start">
           {/* Left content */}
           <div className="pt-[180px] pb-[140px] max-lg:pt-[140px] max-lg:pb-[80px]">
-            <div className="eyebrow">AI VOICE PLATFORM FOR REAL ESTATE</div>
+            <div className="eyebrow">THE AI VOICE INFRASTRUCTURE FOR REAL ESTATE</div>
             <h1
               className="font-display font-bold leading-[1.08] tracking-tight mb-5"
               style={{
@@ -21,15 +21,14 @@ export default function HeroSection() {
                 letterSpacing: '-0.02em',
               }}
             >
-              Every enquiry answered — in the caller's own language, in under{' '}
-              <span style={{ color: 'var(--accent)' }}>2 seconds.</span>
+              Plug the Lead Leakage. Automate Pre-Sales. Maximize{' '}
+              <span style={{ color: 'var(--accent)' }}>Site Visits.</span>
             </h1>
             <p
               className="text-base leading-relaxed max-w-[480px] mb-6"
               style={{ color: 'var(--text-secondary)' }}
             >
-              Wakilz is a self-serve AI voice and chat platform for real estate teams. Activate modules
-              for capture, qualification, scheduling, and follow-up — live in minutes, no code.
+              Wakilz is the AI voice and chat platform built for Developers, Channel Partners (CPs), and Mandate Holders. Automate your entire pre-sales and post-sales workflows. Best of all? <strong>We handle the setup, CRM integration, and maintenance for you.</strong>
             </p>
 
             {/* Language chips */}

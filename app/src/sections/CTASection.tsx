@@ -114,7 +114,7 @@ export default function CTASection() {
             Connect with our Sales Team
           </h2>
           <p className="text-base mb-8 text-center" style={{ color: 'var(--text-secondary)' }}>
-            Fill in your details below and our team will get back to you shortly to set up your AI voice agents.
+            Fill in your details below and our team will get back to you shortly to show you how Wakilz can transform your brokerage or development firm.
           </p>
 
           {status === 'success' ? (

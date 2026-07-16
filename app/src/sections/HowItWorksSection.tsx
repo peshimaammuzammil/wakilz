@@ -6,10 +6,10 @@ import { Plug, ToggleRight, Phone, TrendingUp } from 'lucide-react'
 gsap.registerPlugin(ScrollTrigger)
 
 const steps = [
-  { num: '01', title: 'Connect', desc: 'Link your phone number or WhatsApp Business account.', Icon: Plug },
-  { num: '02', title: 'Activate', desc: 'Turn on the modules you need — one toggle at a time.', Icon: ToggleRight },
-  { num: '03', title: 'Answer', desc: 'Wakilz starts handling calls and messages immediately.', Icon: Phone },
-  { num: '04', title: 'Convert', desc: 'Review qualified leads and booked visits in your dashboard.', Icon: TrendingUp },
+  { num: '01', title: 'Integrate', desc: 'Our team connects Wakilz seamlessly with your CRM and inventory.', Icon: Plug },
+  { num: '02', title: 'Configure', desc: 'We custom-configure the AI qualification matrices to your exact mandate.', Icon: ToggleRight },
+  { num: '03', title: 'Activate', desc: 'Wakilz takes over your top-of-funnel pre-sales immediately.', Icon: Phone },
+  { num: '04', title: 'Scale', desc: 'We maintain the AI. Your brokers just handle the confirmed Site Visits.', Icon: TrendingUp },
 ]
 
 export default function HowItWorksSection() {
@@ -67,7 +67,7 @@ export default function HowItWorksSection() {
               letterSpacing: '-0.015em',
             }}
           >
-            From signup to live calls, same afternoon.
+            Enterprise AI, deployed with zero IT overhead. We do the heavy lifting.
           </h2>
         </div>
 
