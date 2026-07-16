@@ -72,8 +72,8 @@ export default function IntegrationsSection() {
             >
               <div className="flex flex-col items-center gap-2">
                 <div
-                  className="w-12 h-12 rounded-md flex items-center justify-center p-2.5 transition-colors duration-200 hover:bg-[var(--surface-light)]"
-                  style={{ background: 'var(--surface-light)' }}
+                  className="w-12 h-12 rounded-md flex items-center justify-center p-2.5 transition-colors duration-200"
+                  style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)' }}
                 >
                   <img
                     src={`${import.meta.env.BASE_URL}assets/icons/integrations/${int.icon}`}

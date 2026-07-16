@@ -61,7 +61,8 @@ export default function Navigation() {
         <div className="hidden md:flex items-center gap-5">
           <button
             onClick={() => scrollTo('#contact-sales')}
-            className="btn-primary text-sm py-2.5 px-5"
+            className="btn-primary"
+            style={{ fontSize: '13px', padding: '8px 18px', fontFamily: 'var(--font-mono)' }}
           >
             Connect to Sales
           </button>
