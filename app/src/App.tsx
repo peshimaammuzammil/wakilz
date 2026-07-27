@@ -3,6 +3,7 @@ import Lenis from 'lenis'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import './App.css'
+import { useVoiceAgent } from './hooks/useVoiceAgent'
 
 import Navigation from './components/Navigation'
 import Footer from './components/Footer'
@@ -20,6 +21,7 @@ gsap.registerPlugin(ScrollTrigger)
 function App() {
   const [heroVisible, setHeroVisible] = useState(true)
   const lenisRef = useRef<Lenis | null>(null)
+  const { state: voiceState, connect, disconnect, isBotSpeaking } = useVoiceAgent()
 
   // Initialize Lenis smooth scroll
   useEffect(() => {
@@ -54,8 +56,8 @@ function App() {
 
   return (
     <div style={{ background: 'var(--deep-navy)', minHeight: '100vh' }}>
-      {/* Fixed hero sphere canvas */}
-      <HeroSphere visible={heroVisible} />
+      {/* Fixed hero sphere canvas — reacts to bot speaking */}
+      <HeroSphere visible={heroVisible} isBotSpeaking={isBotSpeaking} />
 
       {/* Gradient overlay for text legibility - only visible during hero */}
       {heroVisible && (
@@ -73,7 +75,7 @@ function App() {
 
       {/* Main content */}
       <main className="relative" style={{ zIndex: 10 }}>
-        <HeroSection />
+        <HeroSection voiceState={voiceState} onConnect={connect} onDisconnect={disconnect} />
         <ProductSections />
         <HowItWorksSection />
         <LiveConsoleSection />

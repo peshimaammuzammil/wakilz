@@ -1,9 +1,16 @@
 import { useState } from 'react'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, PhoneOff } from 'lucide-react'
+import type { VoiceState } from '../hooks/useVoiceAgent'
 
 const languages = ['English', 'Telugu', 'Hindi'] as const
 
-export default function HeroSection() {
+interface HeroSectionProps {
+  voiceState: VoiceState
+  onConnect: () => Promise<void>
+  onDisconnect: () => void
+}
+
+export default function HeroSection({ voiceState, onConnect, onDisconnect }: HeroSectionProps) {
   const [activeLang, setActiveLang] = useState<'English' | 'Telugu' | 'Hindi'>('English')
 
   return (
@@ -59,15 +66,72 @@ export default function HeroSection() {
                 Connect to Sales
                 <ArrowRight size={16} />
               </button>
-              <button
-                className="btn-secondary font-mono text-sm"
-                onClick={() => {
-                  const el = document.getElementById('console-demo')
-                  if (el) el.scrollIntoView({ behavior: 'smooth' })
-                }}
-              >
-                Watch it take a call
-              </button>
+
+              {/* Voice demo button — state-driven */}
+              {voiceState === 'idle' && (
+                <button
+                  className="btn-secondary font-mono text-sm"
+                  onClick={onConnect}
+                >
+                  Watch it take a call
+                </button>
+              )}
+              {voiceState === 'connecting' && (
+                <button
+                  className="btn-secondary font-mono text-sm"
+                  disabled
+                  style={{ opacity: 0.5, cursor: 'not-allowed' }}
+                >
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      background: 'var(--accent-glow)',
+                      animation: 'pulse 1s ease-in-out infinite',
+                      marginRight: 6,
+                    }}
+                  />
+                  Connecting...
+                </button>
+              )}
+              {voiceState === 'connected' && (
+                <button
+                  className="btn-secondary font-mono text-sm"
+                  onClick={onDisconnect}
+                  style={{
+                    borderColor: '#e05252',
+                    color: '#e05252',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  <span
+                    style={{
+                      width: 7,
+                      height: 7,
+                      borderRadius: '50%',
+                      background: '#e05252',
+                      display: 'inline-block',
+                      animation: 'pulse 1.2s ease-in-out infinite',
+                    }}
+                  />
+                  On Call
+                  <PhoneOff size={13} style={{ marginLeft: 2 }} />
+                  End Call
+                </button>
+              )}
+              {voiceState === 'error' && (
+                <button
+                  className="btn-secondary font-mono text-sm"
+                  onClick={onConnect}
+                  style={{ borderColor: '#e05252', color: '#e05252' }}
+                >
+                  Failed. Try again
+                </button>
+              )}
             </div>
 
             {/* Stat strip */}

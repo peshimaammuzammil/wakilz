@@ -187,7 +187,13 @@ void main() {
 `
 
 /* ── Sphere mesh component ── */
-function IridescentSphere({ progressRef }: { progressRef: React.MutableRefObject<number> }) {
+function IridescentSphere({
+  progressRef,
+  isBotSpeaking,
+}: {
+  progressRef: React.MutableRefObject<number>
+  isBotSpeaking: boolean
+}) {
   const meshRef = useRef<THREE.Mesh>(null)
   const materialRef = useRef<THREE.ShaderMaterial>(null)
 
@@ -206,11 +212,27 @@ function IridescentSphere({ progressRef }: { progressRef: React.MutableRefObject
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime()
+
     if (materialRef.current) {
-      materialRef.current.uniforms.uTime.value = time
-      materialRef.current.uniforms.uHue.value = Math.sin(time * 0.1) * 0.5 + 0.5
-      materialRef.current.uniforms.uProgress.value = progressRef.current
+      const u = materialRef.current.uniforms
+      u.uTime.value = time
+      u.uHue.value = Math.sin(time * 0.1) * 0.5 + 0.5
+      u.uProgress.value = progressRef.current
+
+      // ── Bot-speaking reaction ──────────────────────────────────────────
+      // Lerp distortion uniforms toward energetic values while bot speaks,
+      // then smoothly return to idle. Fast attack (0.08), slow release (0.03)
+      // so the sphere "breathes alive" instantly but calms gracefully.
+      const targetNoise    = isBotSpeaking ? 1.2 : 0.3
+      const targetAmp      = isBotSpeaking ? 2.2 : 0.6
+      const targetFreq     = isBotSpeaking ? 4.0 : 1.5
+      const lerpSpeed      = isBotSpeaking ? 0.08 : 0.03
+
+      u.uNoiseStrength.value += (targetNoise - u.uNoiseStrength.value) * lerpSpeed
+      u.uAmplitude.value     += (targetAmp   - u.uAmplitude.value)     * lerpSpeed
+      u.uFrequency.value     += (targetFreq  - u.uFrequency.value)     * lerpSpeed
     }
+
     if (meshRef.current) {
       meshRef.current.rotation.y = time * 0.08
       const scale = 1.2 * (1.0 - progressRef.current * 0.5)
@@ -299,7 +321,13 @@ function ParticleField({ color, scale, progressRef }: {
 }
 
 /* ── Scene ── */
-function Scene({ progressRef }: { progressRef: React.MutableRefObject<number> }) {
+function Scene({
+  progressRef,
+  isBotSpeaking,
+}: {
+  progressRef: React.MutableRefObject<number>
+  isBotSpeaking: boolean
+}) {
   const { camera } = useThree()
 
   useEffect(() => {
@@ -312,7 +340,7 @@ function Scene({ progressRef }: { progressRef: React.MutableRefObject<number> })
 
   return (
     <>
-      <IridescentSphere progressRef={progressRef} />
+      <IridescentSphere progressRef={progressRef} isBotSpeaking={isBotSpeaking} />
       <ParticleField color="#162032" scale={1.0} progressRef={progressRef} />
       <ParticleField color="#2A3FE0" scale={1.05} progressRef={progressRef} />
       <ParticleField color="#5A6CFF" scale={1.1} progressRef={progressRef} />
@@ -322,7 +350,13 @@ function Scene({ progressRef }: { progressRef: React.MutableRefObject<number> })
 }
 
 /* ── Main exported component ── */
-export default function HeroSphere({ visible }: { visible: boolean }) {
+export default function HeroSphere({
+  visible,
+  isBotSpeaking = false,
+}: {
+  visible: boolean
+  isBotSpeaking?: boolean
+}) {
   const progressRef = useRef(0)
   const [shouldRender, setShouldRender] = useState(true)
 
@@ -354,7 +388,7 @@ export default function HeroSphere({ visible }: { visible: boolean }) {
           gl={{ antialias: true, alpha: true }}
           style={{ background: 'transparent' }}
         >
-          <Scene progressRef={progressRef} />
+          <Scene progressRef={progressRef} isBotSpeaking={isBotSpeaking} />
         </Canvas>
       )}
     </div>
