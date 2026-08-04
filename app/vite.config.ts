@@ -6,11 +6,11 @@ import Sitemap from 'vite-plugin-sitemap'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/wakilz/',
+  base: '/',
   plugins: [
     inspectAttr(), 
     react(),
-    Sitemap({ hostname: 'https://peshimaammuzammil.github.io/wakilz/' })
+    Sitemap({ hostname: 'https://wakilz.com/' })
   ],
   server: {
     port: 3000,
