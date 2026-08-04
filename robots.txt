@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://peshimaammuzammil.github.io/wakilz/sitemap.xml
+Sitemap: https://wakilz.com/sitemap.xml
