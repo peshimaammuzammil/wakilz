@@ -6,6 +6,29 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
+// Compute sphere X position and camera zoom based on viewport width
+function getResponsiveConfig(width: number): { sphereX: number; zoom: number } {
+  if (width < 768) {
+    // Mobile: center the sphere with a higher zoom so it appears as a nice mid-size accent
+    return { sphereX: 0, zoom: 75 }
+  } else if (width < 1024) {
+    // Tablet: slightly right of center, near-desktop zoom
+    return { sphereX: 1.0, zoom: 88 }
+  } else {
+    // Desktop: align with the right 45% column of the hero grid
+    // content-container max-width 1160px centered in viewport
+    // Right column center ≈ viewport/2 + (contentWidth * 0.775 * 0.5)
+    // We want sphere center at ~72.5% of viewport width
+    // At zoom=100, world units map 1:1 to pixels scaled by zoom
+    // sphere at x=2.5 means +250px from canvas center
+    // Adjust: shift slightly rightward to better fill the 45% right zone
+    const targetPixelOffset = Math.min(width * 0.25, 320)
+    const zoom = 100
+    const worldX = targetPixelOffset / zoom
+    return { sphereX: worldX, zoom }
+  }
+}
+
 /* ── GLSL helpers (prepended to both shaders) ── */
 const glslHelpers = /* glsl */ `
 vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -190,9 +213,11 @@ void main() {
 function IridescentSphere({
   progressRef,
   isBotSpeaking,
+  sphereX,
 }: {
   progressRef: React.MutableRefObject<number>
   isBotSpeaking: boolean
+  sphereX: number
 }) {
   const meshRef = useRef<THREE.Mesh>(null)
   const materialRef = useRef<THREE.ShaderMaterial>(null)
@@ -241,7 +266,7 @@ function IridescentSphere({
   })
 
   return (
-    <mesh ref={meshRef} position={[2.5, 0, 0]}>
+    <mesh ref={meshRef} position={[sphereX, 0, 0]}>
       <sphereGeometry args={[1, 128, 128]} />
       <shaderMaterial
         ref={materialRef}
@@ -255,10 +280,11 @@ function IridescentSphere({
 }
 
 /* ── Particle field component ── */
-function ParticleField({ color, scale, progressRef }: {
+function ParticleField({ color, scale, progressRef, sphereX }: {
   color: string
   scale: number
   progressRef: React.MutableRefObject<number>
+  sphereX: number
 }) {
   const pointsRef = useRef<THREE.Points>(null)
   const materialRef = useRef<THREE.ShaderMaterial>(null)
@@ -301,7 +327,7 @@ function ParticleField({ color, scale, progressRef }: {
   })
 
   return (
-    <points ref={pointsRef} position={[2.5, 0, 0]} scale={scale}>
+    <points ref={pointsRef} position={[sphereX, 0, 0]} scale={scale}>
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
         <bufferAttribute attach="attributes-aScale" args={[scales, 1]} />
@@ -324,27 +350,31 @@ function ParticleField({ color, scale, progressRef }: {
 function Scene({
   progressRef,
   isBotSpeaking,
+  sphereX,
+  zoom,
 }: {
   progressRef: React.MutableRefObject<number>
   isBotSpeaking: boolean
+  sphereX: number
+  zoom: number
 }) {
   const { camera } = useThree()
 
   useEffect(() => {
     const orthoCam = camera as THREE.OrthographicCamera
-    orthoCam.zoom = 100
+    orthoCam.zoom = zoom
     orthoCam.near = 0.01
     orthoCam.far = 1000
     orthoCam.updateProjectionMatrix()
-  }, [camera])
+  }, [camera, zoom])
 
   return (
     <>
-      <IridescentSphere progressRef={progressRef} isBotSpeaking={isBotSpeaking} />
-      <ParticleField color="#162032" scale={1.0} progressRef={progressRef} />
-      <ParticleField color="#2A3FE0" scale={1.05} progressRef={progressRef} />
-      <ParticleField color="#5A6CFF" scale={1.1} progressRef={progressRef} />
-      <ParticleField color="#8A9BFF" scale={1.15} progressRef={progressRef} />
+      <IridescentSphere progressRef={progressRef} isBotSpeaking={isBotSpeaking} sphereX={sphereX} />
+      <ParticleField color="#162032" scale={1.0} progressRef={progressRef} sphereX={sphereX} />
+      <ParticleField color="#2A3FE0" scale={1.05} progressRef={progressRef} sphereX={sphereX} />
+      <ParticleField color="#5A6CFF" scale={1.1} progressRef={progressRef} sphereX={sphereX} />
+      <ParticleField color="#8A9BFF" scale={1.15} progressRef={progressRef} sphereX={sphereX} />
     </>
   )
 }
@@ -359,6 +389,14 @@ export default function HeroSphere({
 }) {
   const progressRef = useRef(0)
   const [shouldRender, setShouldRender] = useState(true)
+  const [config, setConfig] = useState(() => getResponsiveConfig(window.innerWidth))
+
+  // Update sphere position/zoom when viewport resizes
+  useEffect(() => {
+    const onResize = () => setConfig(getResponsiveConfig(window.innerWidth))
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
 
   useEffect(() => {
     const trig = ScrollTrigger.create({
@@ -388,7 +426,12 @@ export default function HeroSphere({
           gl={{ antialias: true, alpha: true }}
           style={{ background: 'transparent' }}
         >
-          <Scene progressRef={progressRef} isBotSpeaking={isBotSpeaking} />
+          <Scene
+            progressRef={progressRef}
+            isBotSpeaking={isBotSpeaking}
+            sphereX={config.sphereX}
+            zoom={config.zoom}
+          />
         </Canvas>
       )}
     </div>
