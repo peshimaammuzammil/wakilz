@@ -4,6 +4,28 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Wakilz — AI Voice Agent for Real Estate</title>
+    <meta name="description" content="Wakilz is an AI-powered voice agent platform for real estate lead generation." />
+
+    <!-- GitHub Pages SPA routing: decode the ?p= redirect from 404.html -->
+    <script>
+      (function(l) {
+        if (l.search[1] === '/' || (l.search.indexOf('?p=/') === 0)) {
+          var params = l.search.slice(1).split('&');
+          var path = '';
+          var query = '';
+          for (var i = 0; i < params.length; i++) {
+            if (params[i].slice(0, 2) === 'p=') {
+              path = params[i].slice(2).replace(/~and~/g, '&');
+            } else if (params[i].slice(0, 2) === 'q=') {
+              query = '?' + params[i].slice(2).replace(/~and~/g, '&');
+            }
+          }
+          if (path) {
+            window.history.replaceState(null, null, l.pathname.slice(0, -1) + path + query + l.hash);
+          }
+        }
+      }(window.location))
+    </script>
   </head>
   <body>
     <div id="root"></div>
