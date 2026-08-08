@@ -1,0 +1,21 @@
+{
+  "name": "Wakilz — AI Voice Agent for Real Estate",
+  "short_name": "Wakilz",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0F1D",
+  "theme_color": "#0A0F1D",
+  "description": "AI Voice Agent for Real Estate lead generation, instant qualification, and automated appointment scheduling.",
+  "icons": [
+    {
+      "src": "/assets/images/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
