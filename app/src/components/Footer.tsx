@@ -28,7 +28,7 @@ export default function Footer() {
           {/* Product */}
           <div>
             <h4 className="font-mono text-[11px] tracking-wider uppercase mb-4" style={{ color: 'var(--text-muted)' }}>
-              Product
+              Product & Solutions
             </h4>
             <ul className="list-none p-0 space-y-2">
               {[
@@ -46,6 +46,16 @@ export default function Footer() {
                   </button>
                 </li>
               ))}
+              <li>
+                <a href="/ai-isa-real-estate" className="text-sm text-slate-400 hover:text-white transition-colors">
+                  AI ISA for Real Estate
+                </a>
+              </li>
+              <li>
+                <a href="/multilingual-voice-agent" className="text-sm text-slate-400 hover:text-white transition-colors">
+                  Multilingual Voice AI
+                </a>
+              </li>
             </ul>
           </div>
 

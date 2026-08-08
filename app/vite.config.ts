@@ -13,7 +13,7 @@ export default defineConfig({
     Sitemap({ 
       hostname: 'https://wakilz.com/',
       exclude: ['/404', '404'],
-      dynamicRoutes: ['/conversations']
+      dynamicRoutes: ['/conversations', '/ai-isa-real-estate', '/multilingual-voice-agent']
     })
   ],
   server: {
