@@ -10,7 +10,11 @@ export default defineConfig({
   plugins: [
     inspectAttr(), 
     react(),
-    Sitemap({ hostname: 'https://wakilz.com/' })
+    Sitemap({ 
+      hostname: 'https://wakilz.com/',
+      exclude: ['/404', '404'],
+      dynamicRoutes: ['/conversations']
+    })
   ],
   server: {
     port: 3000,
