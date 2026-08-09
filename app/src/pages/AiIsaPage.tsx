@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import Navigation from '../components/Navigation'
 import Footer from '../components/Footer'
+import CTASection from '../sections/CTASection'
 import { PhoneCall, Zap, CheckCircle2, Calendar, ShieldCheck, ArrowRight } from 'lucide-react'
 
 export default function AiIsaPage() {
@@ -9,11 +10,16 @@ export default function AiIsaPage() {
     window.scrollTo(0, 0)
   }, [])
 
+  const scrollToSales = () => {
+    const el = document.getElementById('contact-sales')
+    if (el) el.scrollIntoView({ behavior: 'smooth' })
+  }
+
   return (
     <div style={{ background: 'var(--deep-navy)', minHeight: '100vh', color: '#FFF' }}>
       <Navigation />
 
-      <main className="pt-32 pb-20 px-6 max-w-6xl mx-auto">
+      <main className="pt-32 pb-10 px-6 max-w-6xl mx-auto">
         {/* Hero Section */}
         <div className="text-center mb-16">
           <span className="px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 mb-4 inline-block">
@@ -26,12 +32,12 @@ export default function AiIsaPage() {
             Never miss a real estate lead again. Wakilz AI ISA responds to inbound calls within 60 seconds, qualifies buyers and sellers, and books appointments directly into your calendar 24/7.
           </p>
           <div className="mt-8 flex flex-wrap gap-4 justify-center">
-            <a
-              href="/#contact-sales"
-              className="px-8 py-4 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2"
+            <button
+              onClick={scrollToSales}
+              className="px-8 py-4 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2 cursor-pointer border-none"
             >
               Get Started with AI ISA <ArrowRight className="w-5 h-5" />
-            </a>
+            </button>
           </div>
         </div>
 
@@ -78,6 +84,9 @@ export default function AiIsaPage() {
           </div>
         </div>
       </main>
+
+      {/* Connect to Sales Team Section */}
+      <CTASection />
 
       <Footer />
     </div>

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import Navigation from '../components/Navigation'
 import Footer from '../components/Footer'
+import CTASection from '../sections/CTASection'
 import { Globe, Languages, Sparkles, Phone, ArrowRight } from 'lucide-react'
 
 export default function MultilingualVoicePage() {
@@ -9,11 +10,16 @@ export default function MultilingualVoicePage() {
     window.scrollTo(0, 0)
   }, [])
 
+  const scrollToSales = () => {
+    const el = document.getElementById('contact-sales')
+    if (el) el.scrollIntoView({ behavior: 'smooth' })
+  }
+
   return (
     <div style={{ background: 'var(--deep-navy)', minHeight: '100vh', color: '#FFF' }}>
       <Navigation />
 
-      <main className="pt-32 pb-20 px-6 max-w-6xl mx-auto">
+      <main className="pt-32 pb-10 px-6 max-w-6xl mx-auto">
         {/* Hero Section */}
         <div className="text-center mb-16">
           <span className="px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mb-4 inline-block">
@@ -26,12 +32,12 @@ export default function MultilingualVoicePage() {
             Speak to buyers in their native language. Wakilz provides natural, ultra-low-latency real estate phone conversations tailored for global markets (US, UAE, UK) and Indian hubs (Telangana, AP, Maharashtra, NCR).
           </p>
           <div className="mt-8 flex flex-wrap gap-4 justify-center">
-            <a
-              href="/#contact-sales"
-              className="px-8 py-4 rounded-xl font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-lg shadow-emerald-600/30 flex items-center gap-2"
+            <button
+              onClick={scrollToSales}
+              className="px-8 py-4 rounded-xl font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-lg shadow-emerald-600/30 flex items-center gap-2 cursor-pointer border-none"
             >
               Deploy Multilingual Agent <ArrowRight className="w-5 h-5" />
-            </a>
+            </button>
           </div>
         </div>
 
@@ -71,6 +77,9 @@ export default function MultilingualVoicePage() {
           </p>
         </div>
       </main>
+
+      {/* Connect to Sales Team Section */}
+      <CTASection />
 
       <Footer />
     </div>
