@@ -1,11 +1,18 @@
+import { Link, useNavigate, useLocation } from 'react-router'
+
 export default function Footer() {
+  const navigate = useNavigate()
+  const location = useLocation()
+
   const navigateOrScroll = (href: string) => {
-    const el = document.querySelector(href)
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' })
-    } else {
-      window.location.href = `/${href}`
+    if (location.pathname === '/') {
+      const el = document.querySelector(href)
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' })
+        return
+      }
     }
+    navigate(`/${href}`)
   }
 
   return (
@@ -14,7 +21,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <a href="/" className="flex items-center gap-2.5 no-underline mb-4">
+            <Link to="/" className="flex items-center gap-2.5 no-underline mb-4">
               <img
                 src={`${import.meta.env.BASE_URL}assets/images/logo.png?v=2`}
                 alt="wakilz logo"
@@ -23,7 +30,7 @@ export default function Footer() {
               <span className="font-display font-bold text-lg" style={{ color: 'var(--text-primary)' }}>
                 wakilz
               </span>
-            </a>
+            </Link>
             <p className="text-sm leading-relaxed max-w-[240px]" style={{ color: 'var(--text-muted)' }}>
               AI voice and chat platform for real estate teams.
             </p>
@@ -36,24 +43,24 @@ export default function Footer() {
             </h4>
             <ul className="list-none p-0 space-y-2">
               <li>
-                <a href="/ai-isa-real-estate" className="text-sm text-slate-400 hover:text-white transition-colors">
+                <Link to="/ai-isa-real-estate" className="text-sm text-slate-400 hover:text-white transition-colors">
                   AI ISA for Real Estate
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/multilingual-voice-agent" className="text-sm text-slate-400 hover:text-white transition-colors">
+                <Link to="/multilingual-voice-agent" className="text-sm text-slate-400 hover:text-white transition-colors">
                   Multilingual Voice AI
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/wakilz-vs-human-isa" className="text-sm text-slate-400 hover:text-white transition-colors">
+                <Link to="/wakilz-vs-human-isa" className="text-sm text-slate-400 hover:text-white transition-colors">
                   Wakilz vs Human ISA
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/ai-voice-agent-luxury-real-estate" className="text-sm text-slate-400 hover:text-white transition-colors">
+                <Link to="/ai-voice-agent-luxury-real-estate" className="text-sm text-slate-400 hover:text-white transition-colors">
                   Luxury Real Estate AI
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

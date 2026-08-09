@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
+import { Link, useNavigate, useLocation } from 'react-router'
 
 const navLinks = [
   { label: 'Platform', href: '#platform' },
@@ -11,6 +12,8 @@ const navLinks = [
 export default function Navigation() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
@@ -20,19 +23,21 @@ export default function Navigation() {
 
   const scrollTo = (href: string) => {
     setMobileOpen(false)
-    const el = document.querySelector(href)
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' })
-    } else {
-      window.location.href = `/${href}`
+    if (location.pathname === '/') {
+      const el = document.querySelector(href)
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' })
+        return
+      }
     }
+    navigate(`/${href}`)
   }
 
   return (
     <nav className={scrolled ? 'scrolled' : ''}>
       <div className="max-w-[1160px] mx-auto px-6 h-full flex items-center justify-between">
         {/* Logo */}
-        <a href="/" className="flex items-center gap-2.5 no-underline">
+        <Link to="/" className="flex items-center gap-2.5 no-underline">
           <img
             src={`${import.meta.env.BASE_URL}assets/images/logo.png?v=2`}
             alt="wakilz logo"
@@ -44,7 +49,7 @@ export default function Navigation() {
           >
             wakilz
           </span>
-        </a>
+        </Link>
 
         {/* Desktop Nav Links */}
         <ul className="hidden md:flex items-center gap-8 list-none">
