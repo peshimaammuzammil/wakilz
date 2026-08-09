@@ -56,6 +56,16 @@ export default function Footer() {
                   Multilingual Voice AI
                 </a>
               </li>
+              <li>
+                <a href="/wakilz-vs-human-isa" className="text-sm text-slate-400 hover:text-white transition-colors">
+                  Wakilz vs Human ISA
+                </a>
+              </li>
+              <li>
+                <a href="/ai-voice-agent-luxury-real-estate" className="text-sm text-slate-400 hover:text-white transition-colors">
+                  Luxury Real Estate AI
+                </a>
+              </li>
             </ul>
           </div>
 
