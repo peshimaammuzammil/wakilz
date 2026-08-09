@@ -1,7 +1,11 @@
 export default function Footer() {
-  const scrollTo = (href: string) => {
+  const navigateOrScroll = (href: string) => {
     const el = document.querySelector(href)
-    if (el) el.scrollIntoView({ behavior: 'smooth' })
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' })
+    } else {
+      window.location.href = `/${href}`
+    }
   }
 
   return (
@@ -10,7 +14,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <a href="#" className="flex items-center gap-2.5 no-underline mb-4">
+            <a href="/" className="flex items-center gap-2.5 no-underline mb-4">
               <img
                 src={`${import.meta.env.BASE_URL}assets/images/logo.png?v=2`}
                 alt="wakilz logo"
@@ -25,27 +29,12 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Product */}
+          {/* Product & Solutions */}
           <div>
             <h4 className="font-mono text-[11px] tracking-wider uppercase mb-4" style={{ color: 'var(--text-muted)' }}>
               Product & Solutions
             </h4>
             <ul className="list-none p-0 space-y-2">
-              {[
-                { label: 'Features', href: '#platform' },
-                { label: 'Pricing', href: '#pricing' },
-                { label: 'Integrations', href: '#integrations' },
-              ].map((link) => (
-                <li key={link.label}>
-                  <button
-                    onClick={() => scrollTo(link.href)}
-                    className="text-sm transition-colors duration-200 hover:text-[var(--text-primary)] bg-transparent border-none cursor-pointer p-0"
-                    style={{ color: 'var(--text-muted)' }}
-                  >
-                    {link.label}
-                  </button>
-                </li>
-              ))}
               <li>
                 <a href="/ai-isa-real-estate" className="text-sm text-slate-400 hover:text-white transition-colors">
                   AI ISA for Real Estate
@@ -75,9 +64,20 @@ export default function Footer() {
               Company
             </h4>
             <ul className="list-none p-0 space-y-2">
-              {['About', 'Blog', 'Careers', 'Contact'].map((label) => (
-                <li key={label}>
-                  <span className="text-sm" style={{ color: 'var(--text-muted)' }}>{label}</span>
+              {[
+                { label: 'Features', href: '#platform' },
+                { label: 'Pricing', href: '#pricing' },
+                { label: 'Integrations', href: '#integrations' },
+                { label: 'Contact', href: '#contact-sales' },
+              ].map((link) => (
+                <li key={link.label}>
+                  <button
+                    onClick={() => navigateOrScroll(link.href)}
+                    className="text-sm transition-colors duration-200 hover:text-[var(--text-primary)] bg-transparent border-none cursor-pointer p-0 text-left"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    {link.label}
+                  </button>
                 </li>
               ))}
             </ul>
