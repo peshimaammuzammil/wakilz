@@ -1000,7 +1000,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Nav */}
-          <nav style={{ padding: '10px 10px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <div role="navigation" style={{ padding: '10px 10px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px' }}>
             {NAV.map(({ key, icon: Icon, label }) => {
               const active = activeNav === key
               return (
@@ -1039,7 +1039,7 @@ export default function AdminDashboard() {
                 Conversations
               </Link>
             </div>
-          </nav>
+          </div>
 
           {/* User footer */}
           <div style={{ padding: '14px 16px', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
