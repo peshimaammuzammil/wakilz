@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, LogIn } from 'lucide-react'
 import { Link, useNavigate, useLocation } from 'react-router'
+import { useAuth } from '@/contexts/AuthContext'
 
 const navLinks = [
   { label: 'Platform', href: '#platform' },
@@ -14,6 +15,7 @@ export default function Navigation() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
+  const { user, profile } = useAuth()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
@@ -75,6 +77,32 @@ export default function Navigation() {
           >
             Connect to Sales
           </button>
+          <button
+            id="signin-nav-btn"
+            onClick={() => navigate(user ? (profile?.role === 'admin' ? '/admin' : '/dashboard') : '/signin')}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              fontSize: '13px', padding: '8px 16px',
+              fontFamily: 'var(--font-mono)', fontWeight: 500,
+              background: 'rgba(90,108,255,0.12)',
+              border: '1px solid rgba(90,108,255,0.3)',
+              borderRadius: '8px',
+              color: 'var(--accent-glow)',
+              cursor: 'pointer',
+              transition: 'background 0.2s, border-color 0.2s',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLButtonElement).style.background = 'rgba(90,108,255,0.2)'
+              ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(90,108,255,0.5)'
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLButtonElement).style.background = 'rgba(90,108,255,0.12)'
+              ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(90,108,255,0.3)'
+            }}
+          >
+            <LogIn size={13} />
+            {user ? 'Dashboard' : 'Sign In'}
+          </button>
         </div>
 
         {/* Mobile menu button */}
@@ -112,6 +140,22 @@ export default function Navigation() {
                 className="btn-primary text-sm py-2.5 px-5 w-full justify-center"
               >
                 Connect to Sales
+              </button>
+            </li>
+            <li className="pt-1">
+              <button
+                onClick={() => { setMobileOpen(false); navigate(user ? (profile?.role === 'admin' ? '/admin' : '/dashboard') : '/signin') }}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                  width: '100%', padding: '10px 20px',
+                  fontFamily: 'var(--font-mono)', fontSize: '13px', fontWeight: 500,
+                  background: 'rgba(90,108,255,0.12)',
+                  border: '1px solid rgba(90,108,255,0.3)',
+                  borderRadius: '8px', color: 'var(--accent-glow)', cursor: 'pointer',
+                }}
+              >
+                <LogIn size={13} />
+                {user ? 'Dashboard' : 'Sign In'}
               </button>
             </li>
           </ul>
