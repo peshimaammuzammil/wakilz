@@ -14,11 +14,17 @@
 import { useState, useRef, useCallback } from 'react'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// UPDATE THIS to your deployed HF Spaces URL after deployment.
-// e.g. 'https://peshimaammuzammil-re-voice-agent.hf.space'
+// Backend URL — set VITE_API_BASE_URL in .env to point to the deployed
+// wakilz-rasen-backend on Cloud Run.
+// e.g. 'https://wakilz-voice-abc123-el.a.run.app'
 // Keep NO trailing slash.
 // ─────────────────────────────────────────────────────────────────────────────
-const HF_SPACE_URL = 'http://localhost:7860'
+const BACKEND_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+
+// Client ID — identifies which client this call belongs to in Firestore.
+// For the public Wakilz demo site: 'wakilz_demo'
+// For white-label embeds: pass the client's key via VITE_CLIENT_ID
+const CLIENT_ID = import.meta.env.VITE_CLIENT_ID || 'wakilz_demo'
 
 export type VoiceState = 'idle' | 'connecting' | 'connected' | 'error'
 
@@ -59,7 +65,7 @@ export function useVoiceAgent(): UseVoiceAgentReturn {
 
     try {
       // ── Step 1: Fetch session token ───────────────────────────────────────
-      const sessionRes = await fetch(`${HF_SPACE_URL}/session`, {
+      const sessionRes = await fetch(`${BACKEND_URL}/session`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       })
@@ -131,7 +137,7 @@ export function useVoiceAgent(): UseVoiceAgentReturn {
       await pc.setLocalDescription(offer)
 
       // A. Call /start to obtain a sessionId
-      const startRes = await fetch(`${HF_SPACE_URL}/start`, {
+      const startRes = await fetch(`${BACKEND_URL}/start`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -139,6 +145,7 @@ export function useVoiceAgent(): UseVoiceAgentReturn {
         },
         body: JSON.stringify({
           transport: 'webrtc',
+          client_id: CLIENT_ID,
         }),
       })
 
@@ -148,7 +155,7 @@ export function useVoiceAgent(): UseVoiceAgentReturn {
       const { sessionId } = await startRes.json() as { sessionId: string }
 
       // B. Call /sessions/{sessionId}/api/offer to send offer and get SDP answer
-      const offerRes = await fetch(`${HF_SPACE_URL}/sessions/${sessionId}/api/offer`, {
+      const offerRes = await fetch(`${BACKEND_URL}/sessions/${sessionId}/api/offer`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -161,7 +168,7 @@ export function useVoiceAgent(): UseVoiceAgentReturn {
       })
 
       if (!offerRes.ok) {
-        throw new Error(`Pipecat /api/offer returned ${offerRes.status}`)
+        throw new Error(`Backend /api/offer returned ${offerRes.status}`)
       }
       const answer = await offerRes.json() as { sdp: string; type: RTCSdpType }
       await pc.setRemoteDescription(new RTCSessionDescription(answer))
