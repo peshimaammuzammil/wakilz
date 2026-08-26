@@ -11,6 +11,7 @@ import SignInPage from './pages/SignInPage.tsx'
 import PortalRedirect from './pages/PortalRedirect.tsx'
 import AdminDashboard from './pages/AdminDashboard.tsx'
 import ClientDashboard from './pages/ClientDashboard.tsx'
+import ClientPreviewPage from './pages/ClientPreviewPage.tsx'
 import ProtectedRoute from './components/ProtectedRoute.tsx'
 import { AuthProvider } from './contexts/AuthContext.tsx'
 
@@ -20,6 +21,7 @@ createRoot(document.getElementById('root')!).render(
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<App />} />
+        <Route path="/client" element={<ClientPreviewPage />} />
         <Route path="/conversations" element={<ConversationsPage />} />
         <Route path="/conversations/:sessionId" element={<ConversationsPage />} />
         <Route path="/ai-isa-real-estate" element={<AiIsaPage />} />
@@ -34,6 +36,14 @@ createRoot(document.getElementById('root')!).render(
         {/* Protected routes */}
         <Route
           path="/admin"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin-dashboard"
           element={
             <ProtectedRoute requiredRole="admin">
               <AdminDashboard />

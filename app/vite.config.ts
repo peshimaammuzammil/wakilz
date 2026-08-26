@@ -18,6 +18,17 @@ export default defineConfig({
   ],
   server: {
     port: 3000,
+    proxy: {
+      // Proxy all backend API calls during local dev → avoids CORS and hard-coded base URL
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+      '/health': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+    },
   },
   resolve: {
     alias: {

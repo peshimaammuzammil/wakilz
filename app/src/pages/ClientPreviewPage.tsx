@@ -1,18 +1,16 @@
 /**
- * ClientDashboard.tsx
+ * ClientPreviewPage.tsx
  *
- * Authenticated Client Dashboard at /dashboard.
- * - Protected route for clients signed in via Firebase Authentication.
- * - Official Wakilz brand icon + wordmark at top left.
- * - Tab Switcher:
+ * Fully wired Wakilz Client Dashboard at /client.
+ * - Official Wakilz brand icon + wordmark at top left
+ * - Portal Tabs:
  *    1. 📊 Analytics & Leads (Live conversion funnel, KPIs, trend, drop causes, language, lead table)
  *    2. 📞 Outbound Campaigns (Rasen outbound batch calling, campaign creation, live recipient diagnostics)
  * - Animated LeadDetailsDrawer: clicking any KPI stat card or lead row slides open full intelligence + Call ID + recording
- * - User profile info & Sign Out button linked with Firebase Auth.
  */
 
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link } from 'react-router'
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid,
@@ -21,9 +19,8 @@ import {
   PhoneCall, CalendarCheck, Trophy, UserCheck, FileCheck,
   Building2, Globe2, ShieldCheck, Calendar, RefreshCw,
   ChevronDown, AlertCircle, Clock, TrendingUp, Phone,
-  Sparkles, Layers, ArrowUpRight, Copy, Check, LogOut, User
+  Sparkles, Layers, ArrowUpRight, Copy, Check
 } from 'lucide-react'
-import { useAuth } from '@/contexts/AuthContext'
 import { useClientDashboard, type LeadRow } from '@/hooks/useClientDashboard'
 import LeadDetailsDrawer from '@/components/client/LeadDetailsDrawer'
 import OutboundCampaignsView from '@/components/client/OutboundCampaignsView'
@@ -158,11 +155,9 @@ function SkeletonCard() {
   )
 }
 
-// ── Main Authenticated Client Dashboard ──────────────────────────────────────
+// ── Main Component ────────────────────────────────────────────────────────────
 
-export default function ClientDashboard() {
-  const { user, profile, logOut } = useAuth()
-  const navigate = useNavigate()
+export default function ClientPreviewPage() {
   const [activeTab, setActiveTab] = useState<'analytics' | 'outbound'>('analytics')
 
   // Date filters
@@ -194,11 +189,6 @@ export default function ClientDashboard() {
     setDrawerOpen(true)
   }
 
-  const handleLogout = async () => {
-    await logOut()
-    navigate('/signin', { replace: true })
-  }
-
   const formatDuration = (secs: number) => {
     const m = Math.floor(secs / 60)
     const s = secs % 60
@@ -214,7 +204,6 @@ export default function ClientDashboard() {
   }
 
   const maxFunnelVal = (data?.funnel[0]?.value) || 1
-  const clientDisplayName = profile?.displayName || user?.email?.split('@')[0] || 'Wakilz Client'
 
   return (
     <div style={{ minHeight: '100vh', background: T.deepNavy, color: T.textPrimary, fontFamily: 'var(--font-body)', paddingBottom: 60 }}>
@@ -287,40 +276,18 @@ export default function ClientDashboard() {
             </button>
           </div>
 
-          {/* Right utilities & Firebase Auth User Profile */}
+          {/* Right utilities */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: T.surface, border: `1px solid ${T.border}`, borderRadius: 20, padding: '5px 12px' }}>
               <Globe2 size={13} color={T.brass} />
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textSecondary }}>EN · HI Multilingual</span>
             </div>
 
-            {/* User Profile Badge */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: T.surfaceLight, border: `1px solid ${T.borderStrong}`, borderRadius: 20, padding: '4px 12px 4px 6px' }}>
-              <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'linear-gradient(135deg, #2A3FE0, #5A6CFF)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#fff' }}>
-                {clientDisplayName[0].toUpperCase()}
-              </div>
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 600, color: T.textPrimary, maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {clientDisplayName}
+            {lastRefreshed && (
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textMuted }}>
+                Updated {lastRefreshed.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}
               </span>
-            </div>
-
-            {/* Sign Out Button */}
-            <button
-              onClick={handleLogout}
-              title="Sign out of client portal"
-              style={{
-                display: 'flex', alignItems: 'center', gap: 6,
-                background: T.surface, border: `1px solid ${T.border}`,
-                borderRadius: 20, padding: '6px 12px',
-                color: T.textMuted, fontSize: 12, cursor: 'pointer',
-                transition: 'all 0.2s ease', fontFamily: 'var(--font-body)'
-              }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = T.red; e.currentTarget.style.color = T.red }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = T.border; e.currentTarget.style.color = T.textMuted }}
-            >
-              <LogOut size={13} />
-              <span>Sign out</span>
-            </button>
+            )}
 
             <button id="refresh-btn" onClick={refresh}
               style={{ display: 'flex', alignItems: 'center', gap: 6, background: T.surface, border: `1px solid ${T.border}`, borderRadius: 20, padding: '6px 14px', color: T.textSecondary, fontSize: 12, cursor: 'pointer', transition: 'all 0.2s ease', fontFamily: 'var(--font-body)' }}
@@ -355,7 +322,7 @@ export default function ClientDashboard() {
             {/* ── Filters: Project & Date Range ── */}
             <section style={{ background: T.surface, border: `1px solid ${T.borderStrong}`, borderRadius: 20, padding: '20px 24px', marginBottom: 28, boxShadow: '0 16px 40px rgba(0,0,0,0.3)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
-                {/* Project indicator */}
+                {/* Project indicator (single client) */}
                 <div style={{ flex: '1 1 260px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'var(--font-mono)', fontSize: 11, color: T.brass, letterSpacing: 1.1, textTransform: 'uppercase', marginBottom: 6, fontWeight: 600 }}>
                     <Building2 size={13} /> Campaign Scope
@@ -363,9 +330,7 @@ export default function ClientDashboard() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: T.deepNavy, border: `1px solid ${T.borderStrong}`, borderRadius: 12, padding: '12px 14px' }}>
                     <span style={{ fontSize: 18 }}>🌟</span>
                     <div>
-                      <div style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 700, color: T.textPrimary }}>
-                        {clientDisplayName}
-                      </div>
+                      <div style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 700, color: T.textPrimary }}>Wakilz Demo Client</div>
                       <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textMuted, marginTop: 1 }}>
                         {loading ? 'Loading...' : `${data?.stats.totalCalls.toLocaleString('en-IN') ?? 0} calls in period`}
                       </div>

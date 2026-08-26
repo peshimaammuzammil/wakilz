@@ -30,13 +30,16 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
     )
   }
 
-  if (!user || !profile) {
+  if (!user) {
     return <Navigate to="/signin" state={{ from: location }} replace />
   }
 
-  if (requiredRole && profile.role !== requiredRole) {
-    // Redirect to appropriate dashboard based on role
-    return <Navigate to={profile.role === 'admin' ? '/admin' : '/dashboard'} replace />
+  // If user is authenticated, determine effective role (defaults to 'client' if profile doc isn't created yet)
+  const userRole = profile?.role || 'client'
+
+  if (requiredRole && userRole !== requiredRole && userRole !== 'admin') {
+    // Redirect to appropriate dashboard based on role (admins can view all)
+    return <Navigate to={userRole === 'admin' ? '/admin-dashboard' : '/dashboard'} replace />
   }
 
   return <>{children}</>

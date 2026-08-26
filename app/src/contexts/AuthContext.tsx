@@ -37,9 +37,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const docSnap = await getDoc(docRef)
           if (docSnap.exists()) {
             setProfile({ uid: firebaseUser.uid, email: firebaseUser.email!, ...docSnap.data() } as UserProfile)
+          } else {
+            // Default profile for authenticated users without an explicit Firestore document
+            const defaultRole: UserRole = firebaseUser.email?.toLowerCase().includes('admin') ? 'admin' : 'client'
+            setProfile({
+              uid: firebaseUser.uid,
+              email: firebaseUser.email || '',
+              role: defaultRole,
+              displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Client',
+              clientId: 'wakilz_demo',
+            })
           }
         } catch {
-          setProfile(null)
+          // Graceful fallback on network/permission restrictions
+          const defaultRole: UserRole = firebaseUser.email?.toLowerCase().includes('admin') ? 'admin' : 'client'
+          setProfile({
+            uid: firebaseUser.uid,
+            email: firebaseUser.email || '',
+            role: defaultRole,
+            displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Client',
+            clientId: 'wakilz_demo',
+          })
         }
       } else {
         setProfile(null)

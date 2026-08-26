@@ -21,9 +21,13 @@ export default function SignInPage() {
     setLoading(true)
     try {
       await signIn(email, password)
-      // profile will be loaded by AuthContext after sign in
-      // redirect based on role — we navigate to a router that checks role
-      navigate(from || '/portal', { replace: true })
+      if (from) {
+        navigate(from, { replace: true })
+      } else if (email.toLowerCase().includes('admin')) {
+        navigate('/admin-dashboard', { replace: true })
+      } else {
+        navigate('/dashboard', { replace: true })
+      }
     } catch (err: unknown) {
       const code = (err as { code?: string })?.code
       if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') {

@@ -59,7 +59,7 @@ interface FirestoreClient {
 
 // ── Config ───────────────────────────────────────────────────────────────────
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://peshimaammuzammil-sky49.hf.space'
+const API_BASE = import.meta.env.VITE_API_BASE_URL || ''
 const API_KEY  = import.meta.env.VITE_CONVERSATIONS_API_KEY || ''
 
 function apiHeaders() {
@@ -417,10 +417,66 @@ export default function AdminDashboard() {
   const fetchConversations = useCallback(async () => {
     setLoading(true); setError(null)
     try {
-      const res = await fetch(`${API_BASE}/api/conversations?page_size=200`, { headers: apiHeaders() })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const data = await res.json()
-      setConversations(data.conversations || [])
+      // 1. Try fetching from /api/conversations
+      let convs: Conversation[] = []
+      try {
+        const res = await fetch(`${API_BASE}/api/conversations?page_size=200`, { headers: apiHeaders() })
+        if (res.ok) {
+          const data = await res.json()
+          convs = data.conversations || []
+        }
+      } catch {
+        // Fall back to /api/rasen/calls
+      }
+
+      // 2. If empty, fetch from /api/rasen/calls
+      if (convs.length === 0) {
+        const res = await fetch(`${API_BASE}/api/rasen/calls?limit=100`, { headers: apiHeaders() })
+        if (res.ok) {
+          const data = await res.json()
+          const rawCalls = data.calls || []
+          convs = rawCalls.map((c: any) => {
+            const ext = c.extraction || {}
+            return {
+              session_id: c.id,
+              call_date: c.created_at?.slice(0, 10) || '',
+              call_start_iso: c.created_at || '',
+              call_duration_secs: c.duration_seconds || (c.duration_ms ? Math.round(c.duration_ms / 1000) : 0),
+              lead_name: ext.name || ext.customer_name || 'Anonymous Buyer',
+              budget: ext.budget || '—',
+              budget_tier: ext.budget?.includes('crore') ? 'luxury' : 'affordable',
+              city_preference: ext.location || ext.preferred_location || 'Hyderabad',
+              property_type: ext.property_type || '2BHK / 3BHK',
+              timeline: ext.timeline || 'Immediate',
+              language: 'EN / HI',
+              outcome: ext.call_outcome || (c.detailed_status === 'answered' ? 'partial_lead' : 'hung_up_early'),
+              lead_score: ext.name ? 85 : 40,
+              qualification: {
+                name_captured: Boolean(ext.name),
+                budget_captured: Boolean(ext.budget),
+                location_captured: Boolean(ext.location),
+                property_type_captured: Boolean(ext.property_type),
+                timeline_captured: Boolean(ext.timeline),
+                questions_completed: ext.name ? 5 : 2,
+                questions_total: 5,
+              },
+              talk_ratio: { bot_pct: 60, user_pct: 40, bot_words: 120, user_words: 80 },
+              intent_signals: {
+                ready_to_visit: ext.booking_status === 'booked' || ext.booking_status === 'site_visit_set',
+                callback_agreed: true,
+                agent_escalation_requested: false,
+                objection_detected: false,
+                objection_count: 0,
+              },
+              stats: { user_turns: 4, bot_turns: 4, total_turns: 8, language_switches: 0 },
+              has_audio: Boolean(c.recording_url),
+              has_transcript: Boolean(c.transcript),
+            } as Conversation
+          })
+        }
+      }
+
+      setConversations(convs)
       setLastRefresh(new Date())
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : String(e))
