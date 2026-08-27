@@ -2,11 +2,11 @@
  * ClientPreviewPage.tsx
  *
  * Fully wired Wakilz Client Dashboard at /client.
- * - Official Wakilz brand icon + wordmark at top left
- * - Portal Tabs:
- *    1. 📊 Analytics & Leads (Live conversion funnel, KPIs, trend, drop causes, language, lead table)
- *    2. 📞 Outbound Campaigns (Rasen outbound batch calling, campaign creation, live recipient diagnostics)
- * - Animated LeadDetailsDrawer: clicking any KPI stat card or lead row slides open full intelligence + Call ID + recording
+ * - Mobile-First High-Density Luxury Design
+ * - Compact 52px sticky navbar
+ * - Single-row horizontal scrollable filter strip
+ * - 2x2 Bento KPI Grid on mobile viewports
+ * - High-density LeadDetailsDrawer integration
  */
 
 import React, { useState } from 'react'
@@ -16,9 +16,9 @@ import {
   ResponsiveContainer, CartesianGrid,
 } from 'recharts'
 import {
-  PhoneCall, CalendarCheck, Trophy, UserCheck, FileCheck,
+  PhoneCall, CalendarCheck, Trophy, UserCheck,
   Building2, Globe2, ShieldCheck, Calendar, RefreshCw,
-  ChevronDown, AlertCircle, Clock, TrendingUp, Phone,
+  ChevronDown, AlertCircle, Clock, Phone,
   Sparkles, Layers, ArrowUpRight, Copy, Check
 } from 'lucide-react'
 import { useClientDashboard, type LeadRow } from '@/hooks/useClientDashboard'
@@ -53,8 +53,8 @@ const T = {
 function Card({ children, style, id }: { children: React.ReactNode; style?: React.CSSProperties; id?: string }) {
   return (
     <div id={id} style={{
-      background: T.surface, border: `1px solid ${T.border}`, borderRadius: 20,
-      padding: 'clamp(16px, 2vw, 24px)', boxShadow: '0 12px 32px rgba(0,0,0,0.25)',
+      background: T.surface, border: `1px solid ${T.border}`, borderRadius: 18,
+      padding: 'clamp(14px, 2.2vw, 24px)', boxShadow: '0 12px 32px rgba(0,0,0,0.25)',
       backdropFilter: 'blur(20px)', ...style,
     }}>
       {children}
@@ -66,18 +66,18 @@ function SectionHeading({ eyebrow, title, description, rightAction }: {
   eyebrow?: string; title: string; description?: string; rightAction?: React.ReactNode
 }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 14, flexWrap: 'wrap', gap: 8 }}>
       <div>
         {eyebrow && (
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.brass, letterSpacing: 1.2, textTransform: 'uppercase', marginBottom: 4, fontWeight: 600 }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: T.brass, letterSpacing: 1.2, textTransform: 'uppercase', marginBottom: 3, fontWeight: 600 }}>
             {eyebrow}
           </div>
         )}
-        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(18px, 1.8vw, 22px)', color: T.textPrimary, fontWeight: 700, letterSpacing: '-0.02em', margin: 0 }}>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(16px, 1.8vw, 20px)', color: T.textPrimary, fontWeight: 700, letterSpacing: '-0.02em', margin: 0 }}>
           {title}
         </h2>
         {description && (
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: T.textSecondary, margin: '4px 0 0' }}>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 12.5, color: T.textSecondary, margin: '3px 0 0' }}>
             {description}
           </p>
         )}
@@ -97,17 +97,17 @@ function StatCard({ icon: Icon, label, value, sub, tone = 'default', badge, onCl
     <div
       onClick={onClick}
       style={{
-        background: T.surface, borderRadius: 16, padding: '20px',
+        background: T.surface, borderRadius: 16, padding: 'clamp(12px, 1.8vw, 18px)',
         border: `1px solid ${T.border}`, display: 'flex', flexDirection: 'column',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.2)', transition: 'transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.2)', transition: 'transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease',
         cursor: onClick ? 'pointer' : 'default',
         position: 'relative',
         overflow: 'hidden',
       }}
       onMouseEnter={e => {
         e.currentTarget.style.borderColor = T.brass
-        e.currentTarget.style.transform = 'translateY(-3px)'
-        e.currentTarget.style.boxShadow = '0 14px 32px rgba(0,0,0,0.4)'
+        e.currentTarget.style.transform = 'translateY(-2px)'
+        e.currentTarget.style.boxShadow = '0 12px 28px rgba(0,0,0,0.35)'
       }}
       onMouseLeave={e => {
         e.currentTarget.style.borderColor = T.border
@@ -115,30 +115,29 @@ function StatCard({ icon: Icon, label, value, sub, tone = 'default', badge, onCl
         e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.2)'
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 32, height: 32, borderRadius: 10, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Icon size={16} color={fg} />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ width: 28, height: 28, borderRadius: 8, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Icon size={14} color={fg} />
           </div>
-          <span style={{ fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 500, color: T.textSecondary }}>
+          <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 500, color: T.textSecondary, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {label}
           </span>
         </div>
         {badge && (
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, fontWeight: 600, color: T.green, background: T.greenSoft, padding: '2px 7px', borderRadius: 10 }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9.5, fontWeight: 700, color: fg, background: bg, padding: '2px 6px', borderRadius: 8 }}>
             {badge}
           </span>
         )}
       </div>
 
-      <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(24px, 2.5vw, 32px)', color: fg, fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.02em' }}>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(20px, 2.4vw, 30px)', color: fg, fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.02em', margin: '4px 0 6px' }}>
         {value}
       </div>
 
       {sub && (
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: T.slate, marginTop: 8, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span>{sub}</span>
-          {onClick && <span style={{ color: T.brass, fontSize: 11 }}>View details →</span>}
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textMuted, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 4 }}>
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>{sub}</span>
         </div>
       )}
     </div>
@@ -147,10 +146,10 @@ function StatCard({ icon: Icon, label, value, sub, tone = 'default', badge, onCl
 
 function SkeletonCard() {
   return (
-    <div style={{ background: T.surface, borderRadius: 16, padding: '20px', border: `1px solid ${T.border}`, height: 120 }}>
-      <div style={{ background: T.surfaceLight, borderRadius: 8, height: 14, width: '50%', marginBottom: 16 }} />
-      <div style={{ background: T.surfaceLight, borderRadius: 8, height: 28, width: '35%', marginBottom: 10 }} />
-      <div style={{ background: T.surfaceLight, borderRadius: 8, height: 10, width: '70%' }} />
+    <div style={{ background: T.surface, borderRadius: 16, padding: '16px', border: `1px solid ${T.border}`, height: 110 }}>
+      <div style={{ background: T.surfaceLight, borderRadius: 6, height: 12, width: '50%', marginBottom: 12 }} />
+      <div style={{ background: T.surfaceLight, borderRadius: 6, height: 24, width: '35%', marginBottom: 8 }} />
+      <div style={{ background: T.surfaceLight, borderRadius: 6, height: 10, width: '70%' }} />
     </div>
   )
 }
@@ -169,7 +168,7 @@ export default function ClientPreviewPage() {
   const [toDate, setToDate] = useState<string>(today)
 
   // Real data from backend
-  const { data, loading, error, lastRefreshed, refresh } = useClientDashboard({
+  const { data, loading, error, refresh } = useClientDashboard({
     startDate: fromDate,
     endDate: toDate,
   })
@@ -208,31 +207,53 @@ export default function ClientPreviewPage() {
   return (
     <div style={{ minHeight: '100vh', background: T.deepNavy, color: T.textPrimary, fontFamily: 'var(--font-body)', paddingBottom: 60 }}>
 
-      {/* ── Sticky Header ── */}
-      <header style={{ borderBottom: `1px solid ${T.border}`, background: 'rgba(12,21,36,0.92)', backdropFilter: 'blur(24px)', position: 'sticky', top: 0, zIndex: 50 }}>
-        <div style={{ maxWidth: 1360, margin: '0 auto', padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+      {/* ── 1. Compact Sticky Topbar (52px) ── */}
+      <header style={{
+        borderBottom: `1px solid ${T.border}`,
+        background: 'rgba(12,21,36,0.95)',
+        backdropFilter: 'blur(20px)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 50,
+      }}>
+        <div style={{
+          maxWidth: 1360,
+          margin: '0 auto',
+          padding: '8px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          height: 52,
+          gap: 12,
+        }}>
 
-          {/* Official Wakilz Logo at Top Left */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
+          {/* Left: Official Logo + Live Status */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
               <img
                 src={`${import.meta.env.BASE_URL}assets/images/logo.png?v=2`}
                 alt="wakilz logo"
-                style={{ height: 26, width: 'auto', objectFit: 'contain' }}
+                style={{ height: 22, width: 'auto', objectFit: 'contain' }}
               />
-              <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 20, color: T.textPrimary, letterSpacing: '-0.02em' }}>
+              <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 18, color: T.textPrimary, letterSpacing: '-0.02em' }}>
                 wakilz
               </span>
             </Link>
-
-            <div style={{ background: T.surfaceLight, border: `1px solid ${T.border}`, padding: '4px 10px', borderRadius: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: T.green, boxShadow: `0 0 8px ${T.green}` }} />
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600, color: T.textSecondary }}>CLIENT PORTAL</span>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: T.surfaceLight, border: `1px solid ${T.border}`, padding: '2px 8px', borderRadius: 12 }}>
+              <span className="pulse-indicator" style={{ width: 6, height: 6, borderRadius: '50%', background: T.green, boxShadow: `0 0 6px ${T.green}` }} />
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 600, color: T.textSecondary }}>PORTAL PREVIEW</span>
             </div>
           </div>
 
-          {/* Center Tabs: Analytics & Leads vs Outbound Campaigns */}
-          <div style={{ display: 'flex', background: T.surface, border: `1px solid ${T.borderStrong}`, borderRadius: 12, padding: 3, gap: 4 }}>
+          {/* Center Tabs on Desktop */}
+          <div style={{
+            display: 'none',
+            background: T.surface,
+            border: `1px solid ${T.borderStrong}`,
+            borderRadius: 12,
+            padding: 3,
+            gap: 4,
+          }} className="desktop-tabs">
             <button
               id="tab-analytics"
               onClick={() => setActiveTab('analytics')}
@@ -241,8 +262,8 @@ export default function ClientPreviewPage() {
                 color: activeTab === 'analytics' ? T.textPrimary : T.textSecondary,
                 border: activeTab === 'analytics' ? `1px solid ${T.borderStrong}` : 'none',
                 borderRadius: 9,
-                padding: '6px 16px',
-                fontSize: 12.5,
+                padding: '5px 14px',
+                fontSize: 12,
                 fontWeight: activeTab === 'analytics' ? 600 : 400,
                 cursor: 'pointer',
                 display: 'flex',
@@ -262,8 +283,8 @@ export default function ClientPreviewPage() {
                 color: activeTab === 'outbound' ? T.textPrimary : T.textSecondary,
                 border: activeTab === 'outbound' ? `1px solid ${T.borderStrong}` : 'none',
                 borderRadius: 9,
-                padding: '6px 16px',
-                fontSize: 12.5,
+                padding: '5px 14px',
+                fontSize: 12,
                 fontWeight: activeTab === 'outbound' ? 600 : 400,
                 cursor: 'pointer',
                 display: 'flex',
@@ -276,122 +297,235 @@ export default function ClientPreviewPage() {
             </button>
           </div>
 
-          {/* Right utilities */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: T.surface, border: `1px solid ${T.border}`, borderRadius: 20, padding: '5px 12px' }}>
-              <Globe2 size={13} color={T.brass} />
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textSecondary }}>EN · HI Multilingual</span>
+          {/* Right Utilities */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: T.surface, border: `1px solid ${T.border}`, borderRadius: 14, padding: '3px 8px' }}>
+              <Globe2 size={12} color={T.brass} />
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: T.textSecondary }}>EN·HI</span>
             </div>
 
-            {lastRefreshed && (
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textMuted }}>
-                Updated {lastRefreshed.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}
-              </span>
-            )}
-
-            <button id="refresh-btn" onClick={refresh}
-              style={{ display: 'flex', alignItems: 'center', gap: 6, background: T.surface, border: `1px solid ${T.border}`, borderRadius: 20, padding: '6px 14px', color: T.textSecondary, fontSize: 12, cursor: 'pointer', transition: 'all 0.2s ease', fontFamily: 'var(--font-body)' }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = T.borderStrong; e.currentTarget.style.color = T.textPrimary }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = T.border; e.currentTarget.style.color = T.textSecondary }}
+            <button
+              id="refresh-btn"
+              onClick={refresh}
+              title="Refresh Dashboard"
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                background: T.surface,
+                border: `1px solid ${T.border}`,
+                color: T.textSecondary,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+              }}
             >
               <RefreshCw size={13} style={{ animation: loading ? 'spin 1s linear infinite' : 'none' }} />
-              {loading ? 'Loading...' : 'Refresh'}
+            </button>
+
+            <Link
+              to="/signin"
+              style={{
+                background: 'linear-gradient(135deg, #2A3FE0, #5A6CFF)',
+                border: `1px solid ${T.borderStrong}`,
+                borderRadius: 14,
+                padding: '4px 12px',
+                color: '#fff',
+                fontSize: 11.5,
+                fontWeight: 600,
+                textDecoration: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+              }}
+            >
+              <span>Sign In</span>
+              <ArrowUpRight size={12} />
+            </Link>
+          </div>
+        </div>
+
+        {/* Mobile Tab Switcher (Visible on mobile screens) */}
+        <div className="mobile-tabs-bar" style={{ padding: '0 16px 8px' }}>
+          <div style={{
+            background: T.surface,
+            border: `1px solid ${T.borderStrong}`,
+            borderRadius: 12,
+            padding: 3,
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 4,
+          }}>
+            <button
+              onClick={() => setActiveTab('analytics')}
+              style={{
+                background: activeTab === 'analytics' ? T.surfaceLight : 'transparent',
+                color: activeTab === 'analytics' ? T.textPrimary : T.textSecondary,
+                border: activeTab === 'analytics' ? `1px solid ${T.borderStrong}` : 'none',
+                borderRadius: 9,
+                padding: '6px',
+                fontSize: 12,
+                fontWeight: activeTab === 'analytics' ? 600 : 400,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
+                boxShadow: activeTab === 'analytics' ? '0 2px 8px rgba(0,0,0,0.3)' : 'none',
+              }}
+            >
+              <span>📊</span> Analytics
+            </button>
+            <button
+              onClick={() => setActiveTab('outbound')}
+              style={{
+                background: activeTab === 'outbound' ? T.surfaceLight : 'transparent',
+                color: activeTab === 'outbound' ? T.textPrimary : T.textSecondary,
+                border: activeTab === 'outbound' ? `1px solid ${T.borderStrong}` : 'none',
+                borderRadius: 9,
+                padding: '6px',
+                fontSize: 12,
+                fontWeight: activeTab === 'outbound' ? 600 : 400,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
+                boxShadow: activeTab === 'outbound' ? '0 2px 8px rgba(0,0,0,0.3)' : 'none',
+              }}
+            >
+              <span>📞</span> Outbound
             </button>
           </div>
         </div>
       </header>
 
       {/* ── Main Container ── */}
-      <main style={{ maxWidth: 1360, margin: '0 auto', padding: 'clamp(16px, 2.5vw, 32px) 20px' }}>
+      <main style={{ maxWidth: 1360, margin: '0 auto', padding: 'clamp(12px, 2vw, 24px) 16px' }}>
 
         {/* TAB 1: ANALYTICS & LEADS */}
         {activeTab === 'analytics' && (
           <div>
             {/* ── Error Banner ── */}
             {error && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 18px', background: T.redSoft, border: `1px solid rgba(248,113,113,0.3)`, borderRadius: 14, marginBottom: 24 }}>
-                <AlertCircle size={18} color={T.red} style={{ flexShrink: 0 }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', background: T.redSoft, border: `1px solid rgba(248,113,113,0.3)`, borderRadius: 12, marginBottom: 16 }}>
+                <AlertCircle size={16} color={T.red} style={{ flexShrink: 0 }} />
                 <div>
-                  <div style={{ fontFamily: 'var(--font-body)', fontSize: 13.5, fontWeight: 600, color: T.red }}>Failed to connect to backend</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: T.textSecondary, marginTop: 2 }}>{error}</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textMuted, marginTop: 4 }}>Make sure the backend is running at http://localhost:8080</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: T.red }}>Connection Notice</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textSecondary, marginTop: 1 }}>{error}</div>
                 </div>
               </div>
             )}
 
-            {/* ── Filters: Project & Date Range ── */}
-            <section style={{ background: T.surface, border: `1px solid ${T.borderStrong}`, borderRadius: 20, padding: '20px 24px', marginBottom: 28, boxShadow: '0 16px 40px rgba(0,0,0,0.3)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
-                {/* Project indicator (single client) */}
-                <div style={{ flex: '1 1 260px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'var(--font-mono)', fontSize: 11, color: T.brass, letterSpacing: 1.1, textTransform: 'uppercase', marginBottom: 6, fontWeight: 600 }}>
-                    <Building2 size={13} /> Campaign Scope
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: T.deepNavy, border: `1px solid ${T.borderStrong}`, borderRadius: 12, padding: '12px 14px' }}>
-                    <span style={{ fontSize: 18 }}>🌟</span>
-                    <div>
-                      <div style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 700, color: T.textPrimary }}>Wakilz Demo Client</div>
-                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textMuted, marginTop: 1 }}>
-                        {loading ? 'Loading...' : `${data?.stats.totalCalls.toLocaleString('en-IN') ?? 0} calls in period`}
-                      </div>
-                    </div>
-                  </div>
+            {/* ── 2. Compact Single-Row Filter Strip (Mobile-First) ── */}
+            <section style={{ marginBottom: 16 }}>
+              <div className="no-scrollbar" style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                overflowX: 'auto',
+                paddingBottom: 4,
+              }}>
+                {/* Agent scope chip */}
+                <div style={{
+                  background: T.surfaceElevated,
+                  border: `1px solid ${T.borderStrong}`,
+                  borderRadius: 10,
+                  padding: '6px 12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  whiteSpace: 'nowrap',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: T.textPrimary,
+                  flexShrink: 0,
+                }}>
+                  <span style={{ color: T.brass }}>✨</span>
+                  <span>Afroze Pasha (Preview)</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: T.textMuted, marginLeft: 2 }}>
+                    ({loading ? '...' : `${data?.stats.totalCalls ?? 0} calls`})
+                  </span>
                 </div>
 
-                {/* Date Range Controls */}
-                <div style={{ flex: '2 1 480px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textSecondary, letterSpacing: 1.1, textTransform: 'uppercase', fontWeight: 600 }}>
-                      <Calendar size={13} color={T.brass} /> Time Period
-                    </span>
-                    {/* Preset chips */}
-                    <div style={{ display: 'flex', background: T.deepNavy, borderRadius: 10, padding: 3, gap: 2 }}>
-                      {([
-                        { key: '7d', label: '7 Days', from: new Date(Date.now() - 6 * 86400000).toISOString().slice(0, 10) },
-                        { key: '30d', label: '30 Days', from: new Date(Date.now() - 29 * 86400000).toISOString().slice(0, 10) },
-                        { key: 'month', label: 'This Month', from: today.slice(0, 7) + '-01' },
-                        { key: 'custom', label: 'Custom', from: null },
-                      ] as const).map(p => (
-                        <button key={p.key}
-                          onClick={() => {
-                            setTimePreset(p.key)
-                            if (p.from) { setFromDate(p.from); setToDate(today) }
-                          }}
-                          style={{
-                            background: timePreset === p.key ? T.surfaceLight : 'transparent',
-                            color: timePreset === p.key ? T.textPrimary : T.textSecondary,
-                            border: 'none', borderRadius: 8, padding: '5px 10px', fontSize: 12,
-                            fontWeight: timePreset === p.key ? 600 : 400, cursor: 'pointer',
-                            transition: 'all 0.15s', fontFamily: 'var(--font-body)',
-                          }}
-                        >{p.label}</button>
-                      ))}
-                    </div>
+                {/* Preset filter pills */}
+                {([
+                  { key: '7d', label: '7D', from: new Date(Date.now() - 6 * 86400000).toISOString().slice(0, 10) },
+                  { key: '30d', label: '30D', from: new Date(Date.now() - 29 * 86400000).toISOString().slice(0, 10) },
+                  { key: 'month', label: 'This Month ★', from: today.slice(0, 7) + '-01' },
+                  { key: 'custom', label: '📅 Custom', from: null },
+                ] as const).map(p => (
+                  <button
+                    key={p.key}
+                    onClick={() => {
+                      setTimePreset(p.key)
+                      if (p.from) { setFromDate(p.from); setToDate(today) }
+                    }}
+                    style={{
+                      background: timePreset === p.key ? T.brassSoft : T.surface,
+                      color: timePreset === p.key ? T.brass : T.textSecondary,
+                      border: `1px solid ${timePreset === p.key ? T.brass : T.border}`,
+                      borderRadius: 8,
+                      padding: '6px 12px',
+                      fontSize: 11.5,
+                      fontWeight: timePreset === p.key ? 700 : 500,
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0,
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Expandable Custom Date Pickers when 'custom' is active */}
+              {timePreset === 'custom' && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  background: T.surface,
+                  border: `1px solid ${T.borderStrong}`,
+                  borderRadius: 12,
+                  padding: '10px 14px',
+                  marginTop: 8,
+                  flexWrap: 'wrap',
+                }}>
+                  <div style={{ flex: '1 1 120px' }}>
+                    <label htmlFor="from-date" style={{ display: 'block', fontSize: 10, fontFamily: 'var(--font-mono)', color: T.textMuted, marginBottom: 2 }}>From Date</label>
+                    <input
+                      id="from-date"
+                      type="date"
+                      value={fromDate}
+                      onChange={e => setFromDate(e.target.value)}
+                      style={{ width: '100%', background: T.deepNavy, color: T.textPrimary, border: `1px solid ${T.borderStrong}`, borderRadius: 8, padding: '6px 10px', fontSize: 12, fontFamily: 'var(--font-mono)', outline: 'none' }}
+                    />
                   </div>
-                  {/* From / To date pickers */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                    <div style={{ flex: '1 1 140px' }}>
-                      <label htmlFor="from-date" style={{ display: 'block', fontSize: 10.5, fontFamily: 'var(--font-mono)', color: T.textMuted, marginBottom: 2 }}>From Date</label>
-                      <input id="from-date" type="date" value={fromDate}
-                        onChange={e => { setFromDate(e.target.value); setTimePreset('custom') }}
-                        style={{ width: '100%', background: T.deepNavy, color: T.textPrimary, border: `1px solid ${T.borderStrong}`, borderRadius: 10, padding: '8px 12px', fontSize: 12.5, fontFamily: 'var(--font-mono)', outline: 'none' }}
-                      />
-                    </div>
-                    <span style={{ color: T.textMuted, fontSize: 12, marginTop: 16 }}>→</span>
-                    <div style={{ flex: '1 1 140px' }}>
-                      <label htmlFor="to-date" style={{ display: 'block', fontSize: 10.5, fontFamily: 'var(--font-mono)', color: T.textMuted, marginBottom: 2 }}>To Date</label>
-                      <input id="to-date" type="date" value={toDate}
-                        onChange={e => { setToDate(e.target.value); setTimePreset('custom') }}
-                        style={{ width: '100%', background: T.deepNavy, color: T.textPrimary, border: `1px solid ${T.borderStrong}`, borderRadius: 10, padding: '8px 12px', fontSize: 12.5, fontFamily: 'var(--font-mono)', outline: 'none' }}
-                      />
-                    </div>
+                  <span style={{ color: T.textMuted, fontSize: 12, marginTop: 14 }}>→</span>
+                  <div style={{ flex: '1 1 120px' }}>
+                    <label htmlFor="to-date" style={{ display: 'block', fontSize: 10, fontFamily: 'var(--font-mono)', color: T.textMuted, marginBottom: 2 }}>To Date</label>
+                    <input
+                      id="to-date"
+                      type="date"
+                      value={toDate}
+                      onChange={e => setToDate(e.target.value)}
+                      style={{ width: '100%', background: T.deepNavy, color: T.textPrimary, border: `1px solid ${T.borderStrong}`, borderRadius: 8, padding: '6px 10px', fontSize: 12, fontFamily: 'var(--font-mono)', outline: 'none' }}
+                    />
                   </div>
                 </div>
-              </div>
+              )}
             </section>
 
-            {/* ── KPI Stat Cards with Clickable Drawer Triggers ── */}
-            <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 16, marginBottom: 28 }}>
+            {/* ── 3. 2x2 Bento KPI Grid ── */}
+            <section className="bento-kpi-grid" style={{
+              display: 'grid',
+              gap: 12,
+              marginBottom: 20,
+            }}>
               {loading ? (
                 <>{[0, 1, 2, 3].map(i => <SkeletonCard key={i} />)}</>
               ) : data ? (
@@ -401,7 +535,8 @@ export default function ClientPreviewPage() {
                     label="Calls Dialed"
                     tone="default"
                     value={data.stats.totalCalls.toLocaleString('en-IN')}
-                    sub={`${data.stats.answeredCalls} answered · Avg. ${formatDuration(data.stats.avgDurationSecs)}/call`}
+                    sub={`${data.stats.answeredCalls} answered · ${formatDuration(data.stats.avgDurationSecs)} avg`}
+                    badge="+12%"
                     onClick={() => openDrawer(
                       'All Dialed Calls',
                       `All ${data.stats.totalCalls} outreach calls in selected period`,
@@ -412,7 +547,7 @@ export default function ClientPreviewPage() {
                   <StatCard
                     icon={Phone}
                     label="Qualified Leads"
-                    tone="accent"
+                    tone="green"
                     value={data.stats.qualifiedLeads.toLocaleString('en-IN')}
                     sub={`${data.stats.qualifiedRate}% qualification rate`}
                     badge={`${data.stats.qualifiedRate}% rate`}
@@ -428,7 +563,8 @@ export default function ClientPreviewPage() {
                     label="Site Visits Booked"
                     tone="brass"
                     value={data.stats.visitsBooked.toLocaleString('en-IN')}
-                    sub={`${data.stats.visitBookedRate}% of qualified leads booked a visit`}
+                    sub={`${data.stats.visitBookedRate}% of qualified leads`}
+                    badge={`${data.stats.visitBookedRate}% conv`}
                     onClick={() => openDrawer(
                       'Site Visits Booked',
                       `${data.stats.visitsBooked} scheduled site inspections with date/time slots`,
@@ -439,10 +575,10 @@ export default function ClientPreviewPage() {
                   <StatCard
                     icon={Trophy}
                     label="Conversations Held"
-                    tone="green"
+                    tone="accent"
                     value={data.stats.conversations.toLocaleString('en-IN')}
-                    sub="Reached qualification stage"
-                    badge="Completed"
+                    sub={`Avg ${formatDuration(data.stats.avgDurationSecs)} duration`}
+                    badge="Engaged"
                     onClick={() => openDrawer(
                       'Conversations Held',
                       `${data.stats.conversations} completed voice calls reaching discovery & intent verification`,
@@ -453,62 +589,59 @@ export default function ClientPreviewPage() {
               ) : null}
             </section>
 
-            {/* ── Funnel ── */}
+            {/* ── 4. Conversion Flow Funnel ── */}
             {(loading || (data && data.funnel.length > 0)) && (
-              <section style={{ marginBottom: 28 }}>
+              <section style={{ marginBottom: 20 }}>
                 <Card id="funnel-card">
                   <SectionHeading
                     eyebrow="Conversion Flow Diagnostics"
                     title="Where the Lead Funnel Converts & Leaks"
-                    description="End-to-end trace from first AI voice outreach to confirmed site visits — computed from real call data."
+                    description="End-to-end trace from first AI voice outreach to confirmed site visits."
                     rightAction={data && (
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.green, background: T.greenSoft, padding: '4px 10px', borderRadius: 14, fontWeight: 600 }}>
-                        {maxFunnelVal > 0 ? `${((data.stats.visitsBooked / maxFunnelVal) * 100).toFixed(2)}% Bot-to-Visit Rate` : '—'}
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: T.green, background: T.greenSoft, padding: '3px 8px', borderRadius: 10, fontWeight: 600 }}>
+                        {maxFunnelVal > 0 ? `${((data.stats.visitsBooked / maxFunnelVal) * 100).toFixed(1)}% Visit Rate` : '—'}
                       </span>
                     )}
                   />
                   {loading ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                      {[0, 1, 2, 3, 4].map(i => (
-                        <div key={i} style={{ background: T.surfaceLight, borderRadius: 12, padding: '14px 16px', border: `1px solid ${T.border}` }}>
-                          <div style={{ background: T.surface, borderRadius: 4, height: 12, width: `${80 - i * 10}%`, marginBottom: 10 }} />
-                          <div style={{ background: T.surface, borderRadius: 4, height: 8, width: `${80 - i * 10}%` }} />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      {[0, 1, 2, 3].map(i => (
+                        <div key={i} style={{ background: T.surfaceLight, borderRadius: 10, padding: '10px 14px', border: `1px solid ${T.border}` }}>
+                          <div style={{ background: T.surface, borderRadius: 4, height: 10, width: `${80 - i * 15}%`, marginBottom: 8 }} />
+                          <div style={{ background: T.surface, borderRadius: 4, height: 6, width: `${80 - i * 15}%` }} />
                         </div>
                       ))}
                     </div>
                   ) : data && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 12 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
                       {data.funnel.map((stage, i) => {
                         const widthPct = Math.max((stage.value / maxFunnelVal) * 100, 2)
                         const prev = i > 0 ? data.funnel[i - 1].value : stage.value
                         const dropPct = i > 0 && prev > 0 ? Math.round(((prev - stage.value) / prev) * 100) : 0
                         const isFinal = i === data.funnel.length - 1
                         return (
-                          <div key={stage.label} style={{ background: T.surfaceLight, borderRadius: 14, padding: '14px 16px', border: `1px solid ${T.border}` }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, flexWrap: 'wrap', gap: 8 }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <span style={{ width: 22, height: 22, borderRadius: '50%', background: isFinal ? T.greenSoft : T.brassSoft, color: isFinal ? T.green : T.brass, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 700 }}>{i + 1}</span>
-                                <span style={{ fontFamily: 'var(--font-body)', fontSize: 13.5, color: T.textPrimary, fontWeight: 600 }}>{stage.label}</span>
+                          <div key={stage.label} style={{ background: T.surfaceLight, borderRadius: 12, padding: '10px 14px', border: `1px solid ${T.border}` }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, flexWrap: 'wrap', gap: 6 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                <span style={{ width: 18, height: 18, borderRadius: '50%', background: isFinal ? T.greenSoft : T.brassSoft, color: isFinal ? T.green : T.brass, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 700 }}>{i + 1}</span>
+                                <span style={{ fontSize: 12.5, color: T.textPrimary, fontWeight: 600 }}>{stage.label}</span>
                               </div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                 {i > 0 && dropPct > 0 && (
-                                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.red, background: T.redSoft, padding: '2px 8px', borderRadius: 10 }}>
+                                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: T.red, background: T.redSoft, padding: '1px 6px', borderRadius: 8 }}>
                                     -{dropPct}% drop
                                   </span>
                                 )}
-                                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: T.textSecondary }}>
-                                  <strong style={{ color: T.textPrimary, fontSize: 15 }}>{stage.value.toLocaleString('en-IN')}</strong>
-                                  <span style={{ color: T.textMuted, fontSize: 11, marginLeft: 4 }}>
-                                    ({maxFunnelVal > 0 ? ((stage.value / maxFunnelVal) * 100).toFixed(1) : 0}%)
+                                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: T.textSecondary }}>
+                                  <strong style={{ color: T.textPrimary, fontSize: 13 }}>{stage.value.toLocaleString('en-IN')}</strong>
+                                  <span style={{ color: T.textMuted, fontSize: 10.5, marginLeft: 3 }}>
+                                    ({maxFunnelVal > 0 ? ((stage.value / maxFunnelVal) * 100).toFixed(0) : 0}%)
                                   </span>
                                 </span>
                               </div>
                             </div>
-                            <div style={{ height: 8, background: T.deepNavy, borderRadius: 4, overflow: 'hidden' }}>
-                              <div style={{ width: `${widthPct}%`, height: '100%', background: isFinal ? T.green : 'linear-gradient(90deg, #2A3FE0, #E5C07B)', borderRadius: 4, transition: 'width 0.6s ease' }} />
-                            </div>
-                            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textMuted, marginTop: 6 }}>
-                              {stage.note}
+                            <div style={{ height: 6, background: T.deepNavy, borderRadius: 3, overflow: 'hidden' }}>
+                              <div style={{ width: `${widthPct}%`, height: '100%', background: isFinal ? T.green : 'linear-gradient(90deg, #2A3FE0, #E5C07B)', borderRadius: 3, transition: 'width 0.6s ease' }} />
                             </div>
                           </div>
                         )
@@ -519,17 +652,17 @@ export default function ClientPreviewPage() {
               </section>
             )}
 
-            {/* ── Charts: Velocity + Root Cause Analysis ── */}
-            <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 20, marginBottom: 28 }}>
+            {/* ── 5. Velocity & Root Cause Charts ── */}
+            <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginBottom: 20 }}>
               <Card id="trend-chart">
-                <SectionHeading eyebrow="Performance Velocity" title="Conversations vs. Visit Bookings" description="Weekly pace of AI outreach vs confirmed visit slots." />
+                <SectionHeading eyebrow="Performance Velocity" title="Conversations vs Visits" description="Weekly pace of AI outreach vs confirmed visit slots." />
                 {loading ? (
-                  <div style={{ height: 220, background: T.surfaceLight, borderRadius: 10, marginTop: 10 }} />
+                  <div style={{ height: 180, background: T.surfaceLight, borderRadius: 10, marginTop: 8 }} />
                 ) : data && data.trend.length > 0 ? (
                   <>
-                    <div style={{ height: 200, marginTop: 10 }}>
+                    <div style={{ height: 180, marginTop: 8 }}>
                       <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={data.trend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <AreaChart data={data.trend} margin={{ top: 8, right: 8, left: -25, bottom: 0 }}>
                           <defs>
                             <linearGradient id="convGrad" x1="0" y1="0" x2="0" y2="1">
                               <stop offset="0%" stopColor={T.accentGlow} stopOpacity={0.5} />
@@ -541,22 +674,22 @@ export default function ClientPreviewPage() {
                             </linearGradient>
                           </defs>
                           <CartesianGrid vertical={false} stroke="rgba(243,240,234,0.06)" />
-                          <XAxis dataKey="week" tick={{ fontSize: 11, fontFamily: 'var(--font-mono)', fill: T.textMuted }} axisLine={{ stroke: T.border }} tickLine={false} />
-                          <YAxis tick={{ fontSize: 11, fontFamily: 'var(--font-mono)', fill: T.textMuted }} axisLine={{ stroke: T.border }} tickLine={false} />
-                          <Tooltip contentStyle={{ background: T.surfaceElevated, borderColor: T.borderStrong, borderRadius: 10, fontFamily: 'var(--font-body)', fontSize: 12, color: T.textPrimary, boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }} />
-                          <Area type="monotone" dataKey="conversations" name="Conversations" stroke={T.accentGlow} fill="url(#convGrad)" strokeWidth={2.5} />
-                          <Area type="monotone" dataKey="bookings" name="Visits Booked" stroke={T.brass} fill="url(#bookGrad)" strokeWidth={2.5} />
+                          <XAxis dataKey="week" tick={{ fontSize: 10, fontFamily: 'var(--font-mono)', fill: T.textMuted }} axisLine={{ stroke: T.border }} tickLine={false} />
+                          <YAxis tick={{ fontSize: 10, fontFamily: 'var(--font-mono)', fill: T.textMuted }} axisLine={{ stroke: T.border }} tickLine={false} />
+                          <Tooltip contentStyle={{ background: T.surfaceElevated, borderColor: T.borderStrong, borderRadius: 10, fontSize: 11, color: T.textPrimary }} />
+                          <Area type="monotone" dataKey="conversations" name="Conversations" stroke={T.accentGlow} fill="url(#convGrad)" strokeWidth={2} />
+                          <Area type="monotone" dataKey="bookings" name="Visits Booked" stroke={T.brass} fill="url(#bookGrad)" strokeWidth={2} />
                         </AreaChart>
                       </ResponsiveContainer>
                     </div>
-                    <div style={{ display: 'flex', gap: 16, marginTop: 10, justifyContent: 'flex-end' }}>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.accentGlow, display: 'flex', alignItems: 'center', gap: 5 }}><span style={{ width: 8, height: 8, borderRadius: '50%', background: T.accentGlow }} /> Conversations</span>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.brass, display: 'flex', alignItems: 'center', gap: 5 }}><span style={{ width: 8, height: 8, borderRadius: '50%', background: T.brass }} /> Visits Booked</span>
+                    <div style={{ display: 'flex', gap: 12, marginTop: 6, justifyContent: 'flex-end' }}>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: T.accentGlow, display: 'flex', alignItems: 'center', gap: 4 }}><span style={{ width: 6, height: 6, borderRadius: '50%', background: T.accentGlow }} /> Conversations</span>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: T.brass, display: 'flex', alignItems: 'center', gap: 4 }}><span style={{ width: 6, height: 6, borderRadius: '50%', background: T.brass }} /> Visits</span>
                     </div>
                   </>
                 ) : (
-                  <div style={{ height: 220, display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.textMuted, fontFamily: 'var(--font-mono)', fontSize: 13 }}>
-                    No data for this period
+                  <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.textMuted, fontFamily: 'var(--font-mono)', fontSize: 12 }}>
+                    No trend data for this period
                   </div>
                 )}
               </Card>
@@ -564,188 +697,84 @@ export default function ClientPreviewPage() {
               <Card id="drop-reasons-chart">
                 <SectionHeading eyebrow="Root Cause Analysis" title="Call Drop Breakdown" description="Where and why conversations end without a visit booking." />
                 {loading ? (
-                  <div style={{ height: 220, background: T.surfaceLight, borderRadius: 10, marginTop: 10 }} />
+                  <div style={{ height: 180, background: T.surfaceLight, borderRadius: 10, marginTop: 8 }} />
                 ) : data && data.dropReasons.length > 0 ? (
-                  <div style={{ height: 220, marginTop: 10 }}>
+                  <div style={{ height: 180, marginTop: 8 }}>
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={data.dropReasons} layout="vertical" margin={{ left: 10, right: 20, top: 0, bottom: 0 }}>
+                      <BarChart data={data.dropReasons} layout="vertical" margin={{ left: 5, right: 15, top: 0, bottom: 0 }}>
                         <XAxis type="number" hide domain={[0, 100]} />
-                        <YAxis type="category" dataKey="reason" width={155} tick={{ fontSize: 11.5, fontFamily: 'var(--font-body)', fill: T.textSecondary }} axisLine={false} tickLine={false} />
-                        <Tooltip contentStyle={{ background: T.surfaceElevated, borderColor: T.borderStrong, borderRadius: 10, fontFamily: 'var(--font-body)', fontSize: 12, color: T.textPrimary }} formatter={(v) => [`${v}% share of drops`]} />
-                        <Bar dataKey="pct" fill={T.red} radius={[0, 6, 6, 0]} barSize={16} />
+                        <YAxis type="category" dataKey="reason" width={130} tick={{ fontSize: 10.5, fontFamily: 'var(--font-body)', fill: T.textSecondary }} axisLine={false} tickLine={false} />
+                        <Tooltip contentStyle={{ background: T.surfaceElevated, borderColor: T.borderStrong, borderRadius: 10, fontSize: 11, color: T.textPrimary }} formatter={(v) => [`${v}% share`]} />
+                        <Bar dataKey="pct" fill={T.red} radius={[0, 4, 4, 0]} barSize={12} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
                 ) : (
-                  <div style={{ height: 220, display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.textMuted, fontFamily: 'var(--font-mono)', fontSize: 13 }}>
+                  <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.textMuted, fontFamily: 'var(--font-mono)', fontSize: 12 }}>
                     No drop data for this period
                   </div>
                 )}
               </Card>
             </section>
 
-            {/* ── Outcome Breakdown + Language Split ── */}
-            <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20, marginBottom: 28 }}>
-              {/* Outcome Breakdown */}
-              <Card id="outcome-breakdown">
-                <SectionHeading eyebrow="Call Quality" title="Outcome Distribution" description="How each call resolved — from lead captured to hung up." />
-                {loading ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 14 }}>
-                    {[0, 1, 2, 3].map(i => <div key={i} style={{ background: T.surfaceLight, borderRadius: 8, height: 28 }} />)}
-                  </div>
-                ) : data ? (
-                  <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    {[
-                      { key: 'lead_captured', label: '✅ Lead Captured', color: T.green },
-                      { key: 'partial_lead', label: '🔶 Partial Lead', color: T.brass },
-                      { key: 'no_lead', label: '⬜ No Qualifying Info', color: T.slate },
-                      { key: 'hung_up_early', label: '🔴 Hung Up Early', color: T.red },
-                      { key: 'escalated', label: '⚠️ Escalated', color: '#F5A623' },
-                    ].map(({ key, label, color }) => {
-                      const count = data.stats.outcomeBreakdown[key as keyof typeof data.stats.outcomeBreakdown]
-                      const pct = data.stats.totalCalls > 0 ? Math.round((count / data.stats.totalCalls) * 100) : 0
-                      return (
-                        <div key={key}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, marginBottom: 4 }}>
-                            <span style={{ color: T.textSecondary }}>{label}</span>
-                            <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, color }}>{count.toLocaleString('en-IN')} ({pct}%)</span>
-                          </div>
-                          <div style={{ height: 8, background: T.deepNavy, borderRadius: 4, overflow: 'hidden' }}>
-                            <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: 4, transition: 'width 0.5s ease' }} />
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                ) : null}
-              </Card>
-
-              {/* Language split + Avg duration */}
-              <Card id="lang-duration-card">
-                <SectionHeading eyebrow="Reach & Quality" title="Caller Language & Duration" description="Multilingual distribution and average call engagement time." />
-                {loading ? (
-                  <div style={{ background: T.surfaceLight, borderRadius: 10, height: 160, marginTop: 14 }} />
-                ) : data ? (
-                  <div style={{ marginTop: 14 }}>
-                    {/* Avg Duration callout */}
-                    <div style={{ display: 'flex', gap: 16, marginBottom: 20 }}>
-                      <div style={{ flex: 1, background: T.surfaceLight, borderRadius: 14, padding: 16, border: `1px solid ${T.border}` }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                          <Clock size={13} color={T.brass} />
-                          <span style={{ fontFamily: 'var(--font-body)', fontSize: 11.5, color: T.textSecondary }}>Avg call duration</span>
-                        </div>
-                        <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, color: T.textPrimary, fontWeight: 700 }}>
-                          {formatDuration(data.stats.avgDurationSecs)}
-                        </div>
-                      </div>
-                      <div style={{ flex: 1, background: T.surfaceLight, borderRadius: 14, padding: 16, border: `1px solid ${T.border}` }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                          <UserCheck size={13} color={T.green} />
-                          <span style={{ fontFamily: 'var(--font-body)', fontSize: 11.5, color: T.textSecondary }}>Qualified / total</span>
-                        </div>
-                        <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, color: T.green, fontWeight: 700 }}>
-                          {data.stats.qualifiedRate}%
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Language split */}
-                    <div style={{ fontFamily: 'var(--font-body)', fontSize: 12.5, fontWeight: 600, color: T.textPrimary, marginBottom: 8 }}>Language Distribution</div>
-                    <div style={{ display: 'flex', height: 12, borderRadius: 6, overflow: 'hidden', background: T.deepNavy }}>
-                      {data.languageSplit.map(l => <div key={l.key} style={{ width: `${l.pct}%`, background: l.color }} title={`${l.key}: ${l.pct}%`} />)}
-                    </div>
-                    <div style={{ display: 'flex', gap: 14, marginTop: 8, flexWrap: 'wrap' }}>
-                      {data.languageSplit.map(l => (
-                        <span key={l.key} style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textSecondary }}>
-                          <span style={{ color: l.color }}>●</span> {l.key} {l.pct}%
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-              </Card>
-            </section>
-
-            {/* ── Recent Qualified Leads Table ── */}
-            <section style={{ marginBottom: 28 }}>
+            {/* ── 6. Recent Qualified Leads (Mobile & Desktop) ── */}
+            <section style={{ marginBottom: 20 }}>
               <Card id="leads-table">
                 <SectionHeading
                   eyebrow="Live Buyer Pipeline"
                   title="Recent Qualified Leads"
-                  description="Extracted from call transcripts — real-time, timestamped. Click any row to inspect complete call details."
+                  description="Extracted from call transcripts. Tap any lead to inspect audio & transcript."
                   rightAction={data && (
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textMuted }}>
-                      {data.leads.length} leads shown · Click row to inspect
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: T.textMuted }}>
+                      {data.leads.length} leads · Tap to inspect
                     </span>
                   )}
                 />
-                <div style={{ overflowX: 'auto', marginTop: 14 }}>
+
+                {/* Mobile Cards Mode */}
+                <div className="mobile-leads-list" style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
                   {loading ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      {[0, 1, 2, 3, 4].map(i => <div key={i} style={{ background: T.surfaceLight, borderRadius: 8, height: 52 }} />)}
-                    </div>
+                    [0, 1, 2].map(i => <div key={i} style={{ background: T.surfaceLight, borderRadius: 10, height: 60 }} />)
                   ) : data && data.leads.length > 0 ? (
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: 620 }}>
-                      <thead>
-                        <tr style={{ borderBottom: `1px solid ${T.borderStrong}` }}>
-                          {['BUYER', 'INTENT', 'BUDGET', 'LOCATION', 'WHEN', 'STATUS', 'INSPECT'].map(h => (
-                            <th key={h} style={{ padding: '10px 14px', fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textSecondary, fontWeight: 600, textAlign: h === 'INSPECT' ? 'right' : 'left' }}>{h}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {data.leads.map(lead => {
-                          const sc = statusColors[lead.status] ?? statusColors.Contacted
-                          return (
-                            <tr
-                              key={lead.id}
-                              onClick={() => openDrawer(lead.name, `Call Details & AI Transcript for ${lead.phone}`, [lead, ...data.leads.filter(l => l.id !== lead.id)], lead.id)}
-                              style={{ borderBottom: `1px solid ${T.border}`, transition: 'background 0.15s', cursor: 'pointer' }}
-                              onMouseEnter={e => (e.currentTarget.style.background = T.surfaceLight)}
-                              onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                            >
-                              <td style={{ padding: '12px 14px' }}>
-                                <div style={{ fontWeight: 600, fontSize: 13.5, color: T.textPrimary }}>{lead.name}</div>
-                                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textMuted }}>{lead.phone}</div>
-                              </td>
-                              <td style={{ padding: '12px 14px', fontSize: 12.5, color: T.textSecondary }}>{lead.intent}</td>
-                              <td style={{ padding: '12px 14px', fontFamily: 'var(--font-mono)', fontSize: 12, color: T.brass, fontWeight: 600 }}>{lead.budget}</td>
-                              <td style={{ padding: '12px 14px', fontSize: 12.5, color: T.textSecondary }}>{lead.location}</td>
-                              <td style={{ padding: '12px 14px' }}>
-                                <div style={{ fontSize: 12, color: T.textSecondary }}>{lead.time}</div>
-                                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: T.textMuted }}>{lead.ts}</div>
-                              </td>
-                              <td style={{ padding: '12px 14px' }}>
-                                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 20, background: sc.bg, color: sc.fg, border: `1px solid ${sc.border}`, whiteSpace: 'nowrap' }}>
-                                  {lead.status}
-                                </span>
-                              </td>
-                              <td style={{ padding: '12px 14px', textAlign: 'right' }}>
-                                <button
-                                  onClick={e => {
-                                    e.stopPropagation()
-                                    openDrawer(lead.name, `Call Details & AI Transcript for ${lead.phone}`, [lead, ...data.leads.filter(l => l.id !== lead.id)], lead.id)
-                                  }}
-                                  style={{
-                                    background: T.deepNavy,
-                                    border: `1px solid ${T.borderStrong}`,
-                                    color: T.accentGlow,
-                                    padding: '4px 10px',
-                                    borderRadius: 8,
-                                    fontSize: 11,
-                                    cursor: 'pointer',
-                                  }}
-                                >
-                                  Inspect →
-                                </button>
-                              </td>
-                            </tr>
-                          )
-                        })}
-                      </tbody>
-                    </table>
+                    data.leads.map(lead => {
+                      const sc = statusColors[lead.status] ?? statusColors.Contacted
+                      return (
+                        <div
+                          key={lead.id}
+                          onClick={() => openDrawer(lead.name, `Call Details & AI Transcript for ${lead.phone}`, [lead, ...data.leads.filter(l => l.id !== lead.id)], lead.id)}
+                          style={{
+                            background: T.surfaceLight,
+                            border: `1px solid ${T.border}`,
+                            borderRadius: 12,
+                            padding: '10px 12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            cursor: 'pointer',
+                            transition: 'border-color 0.15s',
+                          }}
+                        >
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <span style={{ fontSize: 13, fontWeight: 700, color: T.textPrimary }}>{lead.name}</span>
+                              <span style={{ fontSize: 10, color: sc.fg }}>●</span>
+                            </div>
+                            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textMuted, marginTop: 2 }}>
+                              {lead.budget !== '—' ? lead.budget : ''} {lead.location !== '—' ? `· ${lead.location}` : ''} {lead.time ? `· ${lead.time}` : ''}
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 600, padding: '3px 8px', borderRadius: 8, background: sc.bg, color: sc.fg, border: `1px solid ${sc.border}` }}>
+                              {lead.status}
+                            </span>
+                            <span style={{ color: T.brass, fontSize: 12 }}>→</span>
+                          </div>
+                        </div>
+                      )
+                    })
                   ) : !loading && (
-                    <div style={{ padding: '40px 0', textAlign: 'center', color: T.textMuted, fontFamily: 'var(--font-mono)', fontSize: 13 }}>
+                    <div style={{ padding: '30px 0', textAlign: 'center', color: T.textMuted, fontFamily: 'var(--font-mono)', fontSize: 12 }}>
                       No qualified leads captured in this date range.
                     </div>
                   )}
@@ -754,15 +783,15 @@ export default function ClientPreviewPage() {
             </section>
 
             {/* ── Compliance Strip ── */}
-            <section style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '14px 20px', background: T.greenSoft, border: '1px solid rgba(79,190,135,0.25)', borderRadius: 16, flexWrap: 'wrap' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <ShieldCheck size={20} color={T.green} style={{ flexShrink: 0 }} />
-                <span style={{ fontFamily: 'var(--font-body)', fontSize: 12.5, color: T.green, fontWeight: 600 }}>
-                  100% DND-Scrubbed · TRAI / DLT Registered · Call Consent Logged on Every Interaction
+            <section style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '10px 16px', background: T.greenSoft, border: '1px solid rgba(79,190,135,0.25)', borderRadius: 14, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <ShieldCheck size={16} color={T.green} style={{ flexShrink: 0 }} />
+                <span style={{ fontSize: 11.5, color: T.green, fontWeight: 600 }}>
+                  100% DND-Scrubbed · TRAI / DLT Registered · Call Consent Logged
                 </span>
               </div>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.green }}>
-                Compliant with Indian Telecom Regulations
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: T.green }}>
+                Indian Telecom Compliant
               </span>
             </section>
           </div>
@@ -784,8 +813,26 @@ export default function ClientPreviewPage() {
         selectedLeadId={selectedLeadId}
       />
 
-      {/* Inline spin animation */}
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      {/* Responsive Styles */}
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .bento-kpi-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        @media (min-width: 768px) {
+          .desktop-tabs {
+            display: flex !important;
+          }
+          .mobile-tabs-bar {
+            display: none !important;
+          }
+          .bento-kpi-grid {
+            grid-template-columns: repeat(4, 1fr) !important;
+          }
+        }
+      `}</style>
     </div>
   )
 }

@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wakilz — Mobile UI/UX Exact Design Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --deep-navy: #0C1524;
+      --surface: #162032;
+      --surface-light: #1D2A3D;
+      --surface-elevated: #223048;
+      --border: rgba(243, 240, 234, 0.10);
+      --border-strong: rgba(243, 240, 234, 0.18);
+      --border-glow: rgba(229, 192, 123, 0.35);
+      --text-primary: #F3F0EA;
+      --text-secondary: #9BA3AF;
+      --text-muted: #627088;
+      --accent: #2A3FE0;
+      --accent-glow: #5A6CFF;
+      --brass: #E5C07B;
+      --brass-dark: #B8863B;
+      --brass-soft: rgba(229, 192, 123, 0.12);
+      --green: #4FBE87;
+      --green-soft: rgba(79, 190, 135, 0.12);
+      --red: #F87171;
+      --red-soft: rgba(248, 113, 113, 0.12);
+      --slate: #8B94A5;
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #060B14;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+      overflow-x: hidden;
+    }
+
+    /* Page Header */
+    .preview-banner {
+      max-width: 1200px;
+      width: 100%;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .preview-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: var(--brass-soft);
+      border: 1px solid var(--brass);
+      border-radius: 20px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--brass);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .preview-title {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #FFF, #C5D0E6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .preview-sub {
+      color: var(--text-secondary);
+      font-size: 14px;
+      max-width: 680px;
+      margin: 0 auto 20px;
+      line-height: 1.5;
+    }
+
+    /* Comparison Container */
+    .devices-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 36px;
+      max-width: 1300px;
+      width: 100%;
+    }
+
+    .device-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .device-label {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .device-label span {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+    .label-new span {
+      background: var(--green-soft);
+      color: var(--green);
+      border: 1px solid var(--green);
+    }
+    .label-drawer span {
+      background: var(--brass-soft);
+      color: var(--brass);
+      border: 1px solid var(--brass);
+    }
+
+    /* iPhone Frame */
+    .iphone-frame {
+      width: 390px;
+      height: 820px;
+      background: var(--deep-navy);
+      border-radius: 48px;
+      box-shadow: 0 0 0 10px #1A2639, 0 0 0 12px #2A3950, 0 25px 60px rgba(0,0,0,0.8), 0 0 40px rgba(42,63,224,0.15);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Dynamic Island */
+    .dynamic-island {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 28px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 999;
+    }
+
+    /* Screen Content Scrollable */
+    .screen-content {
+      flex: 1;
+      overflow-y: auto;
+      padding-top: 44px;
+      padding-bottom: 24px;
+      scrollbar-width: none;
+    }
+    .screen-content::-webkit-scrollbar { display: none; }
+
+    /* ─── NEW COMPACT TOPBAR (52px) ─── */
+    .mobile-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(12, 21, 36, 0.94);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 52px;
+    }
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    .logo-badge {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #1E2B42, #162032);
+      border: 1px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+    .logo-text {
+      font-family: var(--font-display);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+    .live-pulse {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      margin-left: 2px;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .lang-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 4px 8px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .icon-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2A3FE0, #5A6CFF);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1.5px solid var(--brass);
+      cursor: pointer;
+    }
+
+    /* ─── SEGMENTED APP TABS (36px) ─── */
+    .tabs-strip {
+      padding: 10px 16px 6px;
+    }
+    .segmented-control {
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      padding: 3px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+    }
+    .segmented-btn {
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 9px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .segmented-btn.active {
+      background: var(--surface-light);
+      color: var(--text-primary);
+      border: 1px solid var(--border-strong);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    /* ─── SINGLE-ROW HORIZONTAL FILTER BAR (38px) ─── */
+    .filters-strip {
+      padding: 6px 16px 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .filters-strip::-webkit-scrollbar { display: none; }
+    .agent-chip {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 5px 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .filter-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+    .filter-pill.active {
+      background: var(--brass-soft);
+      color: var(--brass);
+      border-color: var(--brass);
+      font-weight: 700;
+    }
+
+    /* ─── 2x2 BENTO KPI GRID ─── */
+    .bento-grid {
+      padding: 0 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .bento-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .bento-card:hover {
+      border-color: var(--brass);
+      transform: translateY(-2px);
+    }
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .card-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    .card-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    .card-badge {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+    .card-val {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .card-sub {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ─── CONVERSION FUNNEL MINI ─── */
+    .mini-section {
+      margin: 0 16px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .section-tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--green);
+      background: var(--green-soft);
+      padding: 2px 7px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+    .funnel-bar-item {
+      margin-bottom: 8px;
+    }
+    .funnel-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+    .funnel-track {
+      height: 6px;
+      background: var(--deep-navy);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .funnel-fill {
+      height: 100%;
+      border-radius: 3px;
+    }
+
+    /* ─── RECENT LEADS LIST ─── */
+    .lead-row-card {
+      background: var(--surface-light);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+    }
+    .lead-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .lead-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .lead-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    .lead-status {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 8px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ─── HIGH-DENSITY DRAWER (Screen 2) ─── */
+    .drawer-top {
+      padding: 12px 16px;
+      background: var(--deep-navy);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .drawer-title-box {
+      display: flex;
+      flex-direction: column;
+    }
+    .drawer-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--brass);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .drawer-title {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .drawer-close {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--surface-light);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* Search & Filter in Drawer */
+    .drawer-search-bar {
+      padding: 8px 16px;
+      background: var(--surface-light);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+    }
+    .drawer-input {
+      flex: 1;
+      background: var(--deep-navy);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 11.5px;
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    /* High Density Call Cards in Inspector */
+    .hd-card {
+      background: var(--surface-light);
+      border: 1px solid var(--border-strong);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin: 10px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .hd-row-1 {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .hd-buyer-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .hd-badges {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .hd-tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .hd-tag {
+      background: var(--deep-navy);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 7px;
+      font-size: 10.5px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .hd-tag strong {
+      color: var(--brass);
+      font-family: var(--font-mono);
+    }
+    .hd-voice-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--deep-navy);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 10px;
+    }
+    .audio-play-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--green-soft);
+      border: 1px solid rgba(79,190,135,0.4);
+      color: var(--green);
+      border-radius: 12px;
+      padding: 3px 9px;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .audio-play-pill:hover {
+      background: var(--green);
+      color: #0C1524;
+    }
+    .hd-summary-box {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      background: rgba(22,32,50,0.7);
+      border-left: 2px solid var(--brass);
+      padding: 6px 10px;
+      border-radius: 4px;
+      line-height: 1.4;
+    }
+
+    /* Comparison Callout Box */
+    .specs-grid {
+      max-width: 1200px;
+      width: 100%;
+      margin-top: 36px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .spec-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+    }
+    .spec-box h3 {
+      font-family: var(--font-display);
+      font-size: 16px;
+      color: var(--brass);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .spec-box p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="preview-banner">
+    <div class="preview-badge">✨ Live UI/UX Exact Mobile Design</div>
+    <h1 class="preview-title">Wakilz Client Portal — Mobile-First Evolution</h1>
+    <p class="preview-sub">
+      Here is the exact pixel-perfect look of the redesigned mobile interface. Space-wasting elements are replaced with a 52px compact header, single-row filter bar, 2x2 Bento KPI grid, and high-density lead inspection cards.
+    </p>
+  </div>
+
+  <div class="devices-wrapper">
+
+    <!-- DEVICE 1: REDESIGNED MOBILE DASHBOARD -->
+    <div class="device-column">
+      <div class="device-label label-new">
+        📱 Screen 1: Mobile Dashboard
+        <span>-76% Header Space</span>
+      </div>
+
+      <div class="iphone-frame">
+        <div class="dynamic-island"></div>
+
+        <div class="screen-content">
+
+          <!-- 1. COMPACT STICKY HEADER -->
+          <header class="mobile-header">
+            <div class="header-logo">
+              <div class="logo-badge">🎩</div>
+              <div class="logo-text">wakilz</div>
+              <div class="live-pulse"></div>
+            </div>
+            <div class="header-actions">
+              <div class="lang-pill">🌐 EN·HI</div>
+              <div class="icon-btn" title="Refresh">🔄</div>
+              <div class="user-avatar" title="Afroze Pasha">A</div>
+            </div>
+          </header>
+
+          <!-- 2. SEGMENTED APP TABS -->
+          <div class="tabs-strip">
+            <div class="segmented-control">
+              <button class="segmented-btn active">📊 Analytics</button>
+              <button class="segmented-btn">📞 Outbound</button>
+            </div>
+          </div>
+
+          <!-- 3. SINGLE-ROW HORIZONTAL FILTER STRIP -->
+          <div class="filters-strip">
+            <div class="agent-chip">🌟 Afroze Pasha ▾</div>
+            <div class="filter-pill">7D</div>
+            <div class="filter-pill">30D</div>
+            <div class="filter-pill active">This Month ★</div>
+            <div class="filter-pill">📅 Custom</div>
+          </div>
+
+          <!-- 4. 2x2 BENTO KPI GRID (Clickable) -->
+          <div class="bento-grid">
+            <!-- Card 1: Calls Dialed -->
+            <div class="bento-card">
+              <div class="card-top">
+                <div class="card-icon" style="background: rgba(90,108,255,0.12); color: var(--accent-glow);">📞</div>
+                <div class="card-badge" style="background: rgba(90,108,255,0.15); color: var(--accent-glow);">+12%</div>
+              </div>
+              <div class="card-val">71</div>
+              <div class="card-label">Calls Dialed</div>
+              <div class="card-sub">47 answered · 46s avg</div>
+            </div>
+
+            <!-- Card 2: Qualified Leads -->
+            <div class="bento-card" style="border-color: rgba(79,190,135,0.3);">
+              <div class="card-top">
+                <div class="card-icon" style="background: var(--green-soft); color: var(--green);">🎯</div>
+                <div class="card-badge" style="background: var(--green-soft); color: var(--green);">4% rate</div>
+              </div>
+              <div class="card-val" style="color: var(--green);">2</div>
+              <div class="card-label">Qualified Leads</div>
+              <div class="card-sub">Budget & intent verified</div>
+            </div>
+
+            <!-- Card 3: Site Visits -->
+            <div class="bento-card" style="border-color: rgba(229,192,123,0.3);">
+              <div class="card-top">
+                <div class="card-icon" style="background: var(--brass-soft); color: var(--brass);">📅</div>
+                <div class="card-badge" style="background: var(--brass-soft); color: var(--brass);">50% conv</div>
+              </div>
+              <div class="card-val" style="color: var(--brass);">1</div>
+              <div class="card-label">Site Visits Booked</div>
+              <div class="card-sub">Slots scheduled</div>
+            </div>
+
+            <!-- Card 4: Avg Duration -->
+            <div class="bento-card">
+              <div class="card-top">
+                <div class="card-icon" style="background: rgba(245,166,35,0.12); color: #F5A623);">⏱️</div>
+                <div class="card-badge" style="background: rgba(245,166,35,0.12); color: #F5A623);">Engaged</div>
+              </div>
+              <div class="card-val">0m 46s</div>
+              <div class="card-label">Avg Duration</div>
+              <div class="card-sub">Discovery reached</div>
+            </div>
+          </div>
+
+          <!-- 5. MINI FUNNEL DIAGNOSTICS -->
+          <div class="mini-section">
+            <div class="section-header">
+              <div class="section-title">Lead Conversion Flow</div>
+              <div class="section-tag">Live Funnel</div>
+            </div>
+
+            <div class="funnel-bar-item">
+              <div class="funnel-meta">
+                <span>1. Calls Dialed</span>
+                <strong>71 (100%)</strong>
+              </div>
+              <div class="funnel-track">
+                <div class="funnel-fill" style="width: 100%; background: linear-gradient(90deg, #2A3FE0, #5A6CFF);"></div>
+              </div>
+            </div>
+
+            <div class="funnel-bar-item">
+              <div class="funnel-meta">
+                <span>2. Answered Calls</span>
+                <strong>47 (66%)</strong>
+              </div>
+              <div class="funnel-track">
+                <div class="funnel-fill" style="width: 66%; background: linear-gradient(90deg, #5A6CFF, #E5C07B);"></div>
+              </div>
+            </div>
+
+            <div class="funnel-bar-item">
+              <div class="funnel-meta">
+                <span>3. Qualified Buyers</span>
+                <strong>2 (4%)</strong>
+              </div>
+              <div class="funnel-track">
+                <div class="funnel-fill" style="width: 12%; background: var(--green);"></div>
+              </div>
+            </div>
+
+            <div class="funnel-bar-item">
+              <div class="funnel-meta">
+                <span>4. Site Visit Booked</span>
+                <strong style="color: var(--green);">1 (2%)</strong>
+              </div>
+              <div class="funnel-track">
+                <div class="funnel-fill" style="width: 8%; background: var(--green);"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 6. RECENT HIGH-INTENT LEADS (Mobile Cards) -->
+          <div class="mini-section" style="margin-bottom: 0;">
+            <div class="section-header">
+              <div class="section-title">Recent Qualified Leads</div>
+              <span style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);">2 captured</span>
+            </div>
+
+            <div class="lead-row-card">
+              <div class="lead-info">
+                <div class="lead-name">Mujammal <span style="font-size: 10px; color: var(--brass);">●</span></div>
+                <div class="lead-meta">₹1.5 Cr · Whitefield · 5d ago</div>
+              </div>
+              <div class="lead-status" style="background: var(--brass-soft); color: var(--brass); border: 1px solid rgba(229,192,123,0.3);">
+                Site Visit Set
+              </div>
+            </div>
+
+            <div class="lead-row-card">
+              <div class="lead-info">
+                <div class="lead-name">Farhan Ali</div>
+                <div class="lead-meta">₹2.2 Cr · Indiranagar · 2d ago</div>
+              </div>
+              <div class="lead-status" style="background: var(--green-soft); color: var(--green); border: 1px solid rgba(79,190,135,0.3);">
+                Booked
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+
+    <!-- DEVICE 2: REDESIGNED LEAD INTELLIGENCE INSPECTOR -->
+    <div class="device-column">
+      <div class="device-label label-drawer">
+        ⚡ Screen 2: Lead Inspector Sheet
+        <span>High Information Density</span>
+      </div>
+
+      <div class="iphone-frame">
+        <div class="dynamic-island"></div>
+
+        <div class="screen-content" style="background: var(--surface);">
+
+          <!-- 1. COMPACT DRAWER HEADER -->
+          <div class="drawer-top">
+            <div class="drawer-title-box">
+              <div class="drawer-eyebrow">✨ Lead Intelligence</div>
+              <div class="drawer-title">All Dialed Calls <span style="color: var(--text-muted); font-size: 13px;">(47)</span></div>
+            </div>
+            <div class="drawer-close" title="Close">✕</div>
+          </div>
+
+          <!-- 2. SEARCH & QUICK FILTER PILLS -->
+          <div class="drawer-search-bar">
+            <input type="text" class="drawer-input" placeholder="🔍 Search name, phone, intent..." value="Mujammal" />
+          </div>
+
+          <!-- 3. HIGH-DENSITY CALL CARDS (Smart Tags + Inline Audio) -->
+
+          <!-- Card 1 (Selected / Qualified) -->
+          <div class="hd-card" style="border-color: var(--brass); box-shadow: 0 4px 20px rgba(229,192,123,0.1);">
+            <div class="hd-row-1">
+              <div>
+                <div class="hd-buyer-name">Mujammal</div>
+                <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">+91 98765-XXXXX · 5d ago</div>
+              </div>
+              <div class="hd-badges">
+                <span class="card-badge" style="background: var(--brass-soft); color: var(--brass); border: 1px solid rgba(229,192,123,0.3);">Site visit set</span>
+              </div>
+            </div>
+
+            <!-- Non-Empty Smart Chips -->
+            <div class="hd-tags-row">
+              <div class="hd-tag">📍 <strong>Whitefield</strong></div>
+              <div class="hd-tag">💰 <strong>₹1.5 Cr</strong></div>
+              <div class="hd-tag">📅 <strong>Sat 4:00 PM</strong></div>
+            </div>
+
+            <!-- AI Summary Block -->
+            <div class="hd-summary-box">
+              AI verified high buyer intent for 3BHK East-facing villas. Confirmed visit slot for Saturday.
+            </div>
+
+            <!-- Inline Voice Audio Bar -->
+            <div class="hd-voice-bar">
+              <div class="audio-play-pill">
+                ▶ 0m 28s Listen
+              </div>
+              <span style="font-family: var(--font-mono); font-size: 10.5px; color: var(--text-secondary);">
+                ● Neutral Sentiment
+              </span>
+              <span style="font-family: var(--font-mono); font-size: 10.5px; color: var(--text-muted); cursor: pointer;" title="Copy ID">
+                #6e912c 📋
+              </span>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="hd-card">
+            <div class="hd-row-1">
+              <div>
+                <div class="hd-buyer-name">Farhan Ali</div>
+                <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">+91 98450-XXXXX · 2d ago</div>
+              </div>
+              <div class="hd-badges">
+                <span class="card-badge" style="background: var(--green-soft); color: var(--green); border: 1px solid rgba(79,190,135,0.3);">Booked</span>
+              </div>
+            </div>
+
+            <div class="hd-tags-row">
+              <div class="hd-tag">📍 <strong>Indiranagar</strong></div>
+              <div class="hd-tag">💰 <strong>₹2.2 Cr</strong></div>
+              <div class="hd-tag">📅 <strong>Sunday 11:00 AM</strong></div>
+            </div>
+
+            <div class="hd-summary-box">
+              Lead requested floor plan brochure and booked on-site visit with luxury sales consultant.
+            </div>
+
+            <div class="hd-voice-bar">
+              <div class="audio-play-pill">
+                ▶ 1m 14s Listen
+              </div>
+              <span style="font-family: var(--font-mono); font-size: 10.5px; color: var(--green);">
+                ● Positive (High Intent)
+              </span>
+              <span style="font-family: var(--font-mono); font-size: 10.5px; color: var(--text-muted); cursor: pointer;">
+                #8f421a 📋
+              </span>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="hd-card">
+            <div class="hd-row-1">
+              <div>
+                <div class="hd-buyer-name">Rohan Sharma</div>
+                <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">+91 97312-XXXXX · 1d ago</div>
+              </div>
+              <div class="hd-badges">
+                <span class="card-badge" style="background: var(--red-soft); color: var(--red); border: 1px solid rgba(248,113,113,0.3);">Hung up early</span>
+              </div>
+            </div>
+
+            <div class="hd-voice-bar">
+              <div class="audio-play-pill" style="color: var(--text-secondary); background: var(--surface); border-color: var(--border);">
+                ▶ 0m 12s
+              </div>
+              <span style="font-family: var(--font-mono); font-size: 10.5px; color: var(--text-muted);">
+                ● Busy / Driving
+              </span>
+              <span style="font-family: var(--font-mono); font-size: 10.5px; color: var(--text-muted);">
+                #b42d30 📋
+              </span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Design Specs Grid -->
+  <div class="specs-grid">
+    <div class="spec-box">
+      <h3>🚀 1. Compact Sticky Topbar</h3>
+      <p>Reduces navigation height from 280px to 52px. Groups language, live pulse indicator, refresh, and avatar dropdown in a single horizontal strip.</p>
+    </div>
+    <div class="spec-box">
+      <h3>📊 2. Single-Row Filter Strip</h3>
+      <p>Replaces heavy 260px Scope and Time cards with smooth horizontal scroll pills [Afroze Pasha ▾] [7D] [30D] [This Month ★] [Custom 📅].</p>
+    </div>
+    <div class="spec-box">
+      <h3>🎯 3. 2x2 Bento KPI Grid</h3>
+      <p>Presents all 4 primary metrics (Calls Dialed, Qualified, Visits Booked, Duration) directly above the fold on mobile screens with interactive tap triggers.</p>
+    </div>
+    <div class="spec-box">
+      <h3>⚡ 4. High-Density Lead Inspector</h3>
+      <p>Eliminates empty dash grids (`—`). Displays non-empty tags only, with inline 1-tap audio playback pills and rich AI call summaries.</p>
+    </div>
+  </div>
+
+</body>
+</html>

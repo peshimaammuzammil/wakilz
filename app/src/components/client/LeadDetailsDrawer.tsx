@@ -1,24 +1,22 @@
 /**
  * LeadDetailsDrawer.tsx
  *
- * Animated slide-over drawer that displays detailed lead & call intelligence
- * when a user clicks on any KPI Stat Card (Qualified Leads, Site Visits Booked,
- * Conversations Held, Calls Dialed) or a row in the leads table.
- *
- * Features:
- * - Call ID with 1-click clipboard copy
- * - Complete AI transcript extraction (Intent, Budget, Location, Property Type, Timeline, Visit Slot)
- * - Full AI Call Summary
- * - Inline audio recording player (fetches signed recording URL from Rasen API)
- * - Filter & search within the open drawer
- * - Smooth luxury dark glassmorphism animations
+ * Mobile-First High-Density Lead Intelligence Inspector.
+ * - Responsive Slide-Over Drawer on desktop / Bottom Sheet on mobile
+ * - Compact 48px header with live counter and search
+ * - Category filter pills (All, Qualified, Site Visits, Dropped)
+ * - High-density lead cards:
+ *    - Smart non-empty tags only (no empty dash boxes!)
+ *    - Inline 1-tap audio playback button
+ *    - Sentiment indicators
+ *    - Expandable AI Call Summaries & Transcripts
  */
 
 import React, { useState, useEffect } from 'react'
 import {
-  X, Copy, Check, Phone, User, Calendar, MapPin, DollarSign,
-  Clock, Shield, Activity, Volume2, Play, Pause, Search,
-  ExternalLink, Sparkles, CheckCircle2, AlertCircle, Building,
+  X, Copy, Check, Phone,
+  Clock, Activity, Volume2, Play, Pause, Search,
+  Sparkles, AlertCircle, MapPin, DollarSign, Calendar
 } from 'lucide-react'
 import type { LeadRow } from '@/hooks/useClientDashboard'
 import { fetchCallRecordingUrl } from '@/lib/clientApi'
@@ -63,6 +61,7 @@ export default function LeadDetailsDrawer({
   selectedLeadId,
 }: LeadDetailsDrawerProps) {
   const [search, setSearch] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState<'all' | 'qualified' | 'visits' | 'dropped'>('all')
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [playingAudioId, setPlayingAudioId] = useState<string | null>(null)
   const [audioUrls, setAudioUrls] = useState<Record<string, string>>({})
@@ -121,6 +120,12 @@ export default function LeadDetailsDrawer({
   }
 
   const filteredLeads = leads.filter(lead => {
+    // Category filter
+    if (categoryFilter === 'qualified' && (lead.intent === '—' || lead.budget === '—')) return false
+    if (categoryFilter === 'visits' && (lead.status !== 'Site visit set' && lead.status !== 'Booked' && lead.siteVisitSlot === '—')) return false
+    if (categoryFilter === 'dropped' && lead.status !== 'Dropped' && lead.outcome !== 'hung_up_early') return false
+
+    // Search query
     if (!search.trim()) return true
     const q = search.toLowerCase()
     return (
@@ -140,7 +145,7 @@ export default function LeadDetailsDrawer({
         inset: 0,
         zIndex: 100,
         pointerEvents: isOpen ? 'auto' : 'none',
-        transition: 'visibility 0.3s ease',
+        transition: 'visibility 0.25s ease',
         visibility: isOpen ? 'visible' : 'hidden',
       }}
     >
@@ -150,84 +155,60 @@ export default function LeadDetailsDrawer({
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'rgba(5, 10, 20, 0.7)',
+          background: 'rgba(5, 10, 20, 0.75)',
           backdropFilter: 'blur(8px)',
           opacity: isOpen ? 1 : 0,
-          transition: 'opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+          transition: 'opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       />
 
-      {/* Slide-over Panel */}
+      {/* Slide-over / Sheet Panel */}
       <div
+        className="inspector-panel"
         style={{
           position: 'absolute',
           top: 0,
           right: 0,
           bottom: 0,
           width: '100%',
-          maxWidth: '680px',
+          maxWidth: '640px',
           background: T.surface,
           borderLeft: `1px solid ${T.borderStrong}`,
           boxShadow: '-16px 0 48px rgba(0, 0, 0, 0.6)',
           display: 'flex',
           flexDirection: 'column',
           transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
-          transition: 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+          transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
           zIndex: 101,
         }}
       >
-        {/* Drawer Header */}
+        {/* 1. Compact Header (48px) */}
         <div
           style={{
-            padding: '24px 28px',
+            padding: '12px 16px',
             borderBottom: `1px solid ${T.border}`,
             background: T.deepNavy,
             display: 'flex',
-            alignItems: 'flex-start',
+            alignItems: 'center',
             justifyContent: 'space-between',
-            gap: 16,
+            gap: 12,
           }}
         >
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-              <Sparkles size={14} color={T.brass} />
-              <span
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: 11,
-                  color: T.brass,
-                  letterSpacing: 1.2,
-                  textTransform: 'uppercase',
-                  fontWeight: 600,
-                }}
-              >
-                Lead Intelligence Inspector
+          <div style={{ minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+              <Sparkles size={13} color={T.brass} />
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: T.brass, letterSpacing: 1.1, textTransform: 'uppercase', fontWeight: 600 }}>
+                Lead Intelligence
               </span>
             </div>
-            <h2
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 22,
-                color: T.textPrimary,
-                fontWeight: 700,
-                letterSpacing: '-0.02em',
-                margin: 0,
-              }}
-            >
-              {title}
-            </h2>
-            {subtitle && (
-              <p
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  fontSize: 13,
-                  color: T.textSecondary,
-                  margin: '4px 0 0',
-                }}
-              >
-                {subtitle}
-              </p>
-            )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(16px, 1.8vw, 18px)', color: T.textPrimary, fontWeight: 700, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {title}
+              </h2>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textMuted, background: T.surfaceLight, padding: '2px 6px', borderRadius: 6 }}>
+                ({filteredLeads.length})
+              </span>
+            </div>
           </div>
 
           <button
@@ -236,67 +217,52 @@ export default function LeadDetailsDrawer({
               background: T.surfaceLight,
               border: `1px solid ${T.border}`,
               color: T.textSecondary,
-              width: 36,
-              height: 36,
+              width: 32,
+              height: 32,
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              transition: 'all 0.2s',
               flexShrink: 0,
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.color = T.textPrimary
-              e.currentTarget.style.borderColor = T.borderStrong
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.color = T.textSecondary
-              e.currentTarget.style.borderColor = T.border
+              transition: 'all 0.15s',
             }}
             aria-label="Close drawer"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
-        {/* Search Bar & Count */}
+        {/* 2. Integrated Search Bar & Category Filters */}
         <div
           style={{
-            padding: '16px 28px',
+            padding: '10px 16px',
             borderBottom: `1px solid ${T.border}`,
             background: T.surfaceLight,
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 16,
-            flexWrap: 'wrap',
+            flexDirection: 'column',
+            gap: 8,
           }}
         >
-          <div
-            style={{
-              position: 'relative',
-              flex: 1,
-              minWidth: 220,
-            }}
-          >
+          {/* Search Input */}
+          <div style={{ position: 'relative' }}>
             <Search
-              size={15}
+              size={14}
               color={T.textMuted}
-              style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }}
+              style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }}
             />
             <input
               type="text"
-              placeholder="Search by name, phone, location, intent, or Call ID..."
+              placeholder="Search name, phone, intent, or Call ID..."
               value={search}
               onChange={e => setSearch(e.target.value)}
               style={{
                 width: '100%',
                 background: T.deepNavy,
                 border: `1px solid ${T.borderStrong}`,
-                borderRadius: 10,
-                padding: '8px 12px 8px 36px',
-                fontSize: 12.5,
+                borderRadius: 8,
+                padding: '7px 10px 7px 32px',
+                fontSize: 12,
                 color: T.textPrimary,
                 fontFamily: 'var(--font-body)',
                 outline: 'none',
@@ -304,34 +270,53 @@ export default function LeadDetailsDrawer({
             />
           </div>
 
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11.5, color: T.textMuted }}>
-            Showing {filteredLeads.length} of {leads.length} calls
-          </span>
+          {/* Quick Category Filter Pills */}
+          <div className="no-scrollbar" style={{ display: 'flex', alignItems: 'center', gap: 6, overflowX: 'auto', paddingBottom: 2 }}>
+            {([
+              { key: 'all', label: 'All Calls' },
+              { key: 'qualified', label: '🎯 Qualified' },
+              { key: 'visits', label: '📅 Site Visits' },
+              { key: 'dropped', label: '🔴 Dropped' },
+            ] as const).map(f => (
+              <button
+                key={f.key}
+                onClick={() => setCategoryFilter(f.key)}
+                style={{
+                  background: categoryFilter === f.key ? T.brassSoft : T.surface,
+                  color: categoryFilter === f.key ? T.brass : T.textSecondary,
+                  border: `1px solid ${categoryFilter === f.key ? T.brass : T.border}`,
+                  borderRadius: 6,
+                  padding: '4px 10px',
+                  fontSize: 11,
+                  fontWeight: categoryFilter === f.key ? 700 : 500,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                  transition: 'all 0.15s',
+                }}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Leads Cards List */}
+        {/* 3. High-Density Leads List */}
         <div
           style={{
             flex: 1,
             overflowY: 'auto',
-            padding: '20px 28px',
+            padding: '12px 16px',
             display: 'flex',
             flexDirection: 'column',
-            gap: 18,
+            gap: 12,
           }}
         >
           {filteredLeads.length === 0 ? (
-            <div
-              style={{
-                padding: '60px 20px',
-                textAlign: 'center',
-                color: T.textMuted,
-                fontFamily: 'var(--font-body)',
-              }}
-            >
-              <AlertCircle size={32} color={T.slate} style={{ margin: '0 auto 12px' }} />
-              <div style={{ fontSize: 15, fontWeight: 600, color: T.textSecondary }}>No calls match this filter</div>
-              <div style={{ fontSize: 12.5, marginTop: 4 }}>Try adjusting your search terms or date range.</div>
+            <div style={{ padding: '40px 20px', textAlign: 'center', color: T.textMuted }}>
+              <AlertCircle size={28} color={T.slate} style={{ margin: '0 auto 8px' }} />
+              <div style={{ fontSize: 14, fontWeight: 600, color: T.textSecondary }}>No calls match this filter</div>
+              <div style={{ fontSize: 12, marginTop: 2 }}>Try adjusting your search terms or active pill filter.</div>
             </div>
           ) : (
             filteredLeads.map((lead, idx) => {
@@ -340,77 +325,50 @@ export default function LeadDetailsDrawer({
               const audioSrc = audioUrls[lead.callId]
               const isExpanded = expandedSummaryId === lead.callId
 
+              // Only show non-empty parameter tags
+              const hasIntent = lead.intent && lead.intent !== '—' && lead.intent !== 'Unknown'
+              const hasBudget = lead.budget && lead.budget !== '—' && lead.budget !== 'Unknown'
+              const hasLocation = lead.location && lead.location !== '—' && lead.location !== 'Unknown'
+              const hasSiteVisit = lead.siteVisitSlot && lead.siteVisitSlot !== '—'
+
               return (
                 <div
                   key={lead.id || idx}
                   style={{
                     background: isSelected ? T.surfaceElevated : T.surfaceLight,
                     border: `1px solid ${isSelected ? T.brass : T.borderStrong}`,
-                    borderRadius: 16,
-                    padding: '20px',
-                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
-                    transition: 'all 0.2s ease',
+                    borderRadius: 14,
+                    padding: '12px 14px',
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
+                    transition: 'all 0.15s ease',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 8,
                   }}
                 >
-                  {/* Top Row: Call ID & Status */}
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      marginBottom: 14,
-                      flexWrap: 'wrap',
-                      gap: 8,
-                    }}
-                  >
-                    {/* Call ID badge with Copy */}
-                    <div
-                      onClick={e => copyCallId(lead.callId, e)}
-                      title="Click to copy Call ID"
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 6,
-                        background: T.deepNavy,
-                        border: `1px solid ${T.borderStrong}`,
-                        borderRadius: 8,
-                        padding: '4px 10px',
-                        cursor: 'pointer',
-                        transition: 'border-color 0.2s',
-                      }}
-                      onMouseEnter={e => (e.currentTarget.style.borderColor = T.brass)}
-                      onMouseLeave={e => (e.currentTarget.style.borderColor = T.borderStrong)}
-                    >
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textMuted }}>ID:</span>
-                      <span
-                        style={{
-                          fontFamily: 'var(--font-mono)',
-                          fontSize: 11.5,
-                          color: T.textSecondary,
-                          maxWidth: 160,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {lead.callId}
-                      </span>
-                      {copiedId === lead.callId ? (
-                        <Check size={12} color={T.green} />
-                      ) : (
-                        <Copy size={12} color={T.textMuted} />
-                      )}
+                  {/* Row 1: Name, Relative Time, Status Badge */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ fontSize: 14, fontWeight: 700, color: T.textPrimary }}>
+                          {lead.name}
+                        </span>
+                        {lead.status === 'Booked' && <span style={{ color: T.green, fontSize: 10 }}>●</span>}
+                      </div>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textMuted, marginTop: 1 }}>
+                        {lead.phone} {lead.time ? `· ${lead.time}` : ''}
+                      </div>
                     </div>
 
-                    {/* Booking Status & Outcome Badges */}
-                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                    {/* Status badge */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                       <span
                         style={{
                           fontFamily: 'var(--font-mono)',
-                          fontSize: 10.5,
+                          fontSize: 10,
                           fontWeight: 600,
-                          padding: '3px 9px',
-                          borderRadius: 12,
+                          padding: '3px 8px',
+                          borderRadius: 8,
                           background:
                             lead.status === 'Booked'
                               ? T.greenSoft
@@ -431,198 +389,146 @@ export default function LeadDetailsDrawer({
                       >
                         {lead.status}
                       </span>
-
-                      <span
-                        style={{
-                          fontFamily: 'var(--font-mono)',
-                          fontSize: 10.5,
-                          padding: '3px 8px',
-                          borderRadius: 12,
-                          background: T.deepNavy,
-                          color: T.textSecondary,
-                          border: `1px solid ${T.border}`,
-                          textTransform: 'capitalize',
-                        }}
-                      >
-                        {lead.outcome}
-                      </span>
                     </div>
                   </div>
 
-                  {/* Buyer Name & Phone */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 12 }}>
-                    <div>
-                      <h3 style={{ fontSize: 17, fontWeight: 700, color: T.textPrimary, margin: 0 }}>
-                        {lead.name}
-                      </h3>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
-                        <Phone size={12} color={T.brass} />
-                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12.5, color: T.textSecondary }}>
-                          {lead.phone}
+                  {/* Row 2: Smart Non-Empty Parameter Chips (No empty dash grids!) */}
+                  {(hasIntent || hasBudget || hasLocation || hasSiteVisit) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {hasLocation && (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: T.deepNavy, border: `1px solid ${T.border}`, borderRadius: 6, padding: '2px 8px', fontSize: 11, color: T.textSecondary }}>
+                          <span>📍</span> <strong style={{ color: T.textPrimary }}>{lead.location}</strong>
                         </span>
-                      </div>
+                      )}
+                      {hasBudget && (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: T.deepNavy, border: `1px solid ${T.border}`, borderRadius: 6, padding: '2px 8px', fontSize: 11, color: T.textSecondary }}>
+                          <span>💰</span> <strong style={{ color: T.brass, fontFamily: 'var(--font-mono)' }}>{lead.budget}</strong>
+                        </span>
+                      )}
+                      {hasSiteVisit && (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: T.deepNavy, border: `1px solid ${T.border}`, borderRadius: 6, padding: '2px 8px', fontSize: 11, color: T.green }}>
+                          <span>📅</span> <strong style={{ color: T.green }}>{lead.siteVisitSlot}</strong>
+                        </span>
+                      )}
+                      {hasIntent && (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: T.deepNavy, border: `1px solid ${T.border}`, borderRadius: 6, padding: '2px 8px', fontSize: 11, color: T.textSecondary, textTransform: 'capitalize' }}>
+                          <span>🏷️</span> {lead.intent}
+                        </span>
+                      )}
                     </div>
+                  )}
 
-                    <div style={{ textAlign: 'right' }}>
-                      <span style={{ fontSize: 11.5, color: T.textMuted }}>{lead.time}</span>
-                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: T.textMuted }}>{lead.ts}</div>
-                    </div>
-                  </div>
-
-                  {/* Extraction Metrics Grid */}
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
-                      gap: 10,
-                      background: T.deepNavy,
-                      borderRadius: 12,
-                      padding: '12px 14px',
-                      marginBottom: 14,
-                      border: `1px solid ${T.border}`,
-                    }}
-                  >
-                    <div>
-                      <div style={{ fontSize: 10.5, fontFamily: 'var(--font-mono)', color: T.textMuted, textTransform: 'uppercase' }}>
-                        Intent
-                      </div>
-                      <div style={{ fontSize: 12, color: T.textPrimary, fontWeight: 600, marginTop: 2, textTransform: 'capitalize' }}>
-                        {lead.intent}
-                      </div>
-                    </div>
-
-                    <div>
-                      <div style={{ fontSize: 10.5, fontFamily: 'var(--font-mono)', color: T.textMuted, textTransform: 'uppercase' }}>
-                        Budget Range
-                      </div>
-                      <div style={{ fontSize: 12, color: T.brass, fontWeight: 600, marginTop: 2 }}>
-                        {lead.budget}
-                      </div>
-                    </div>
-
-                    <div>
-                      <div style={{ fontSize: 10.5, fontFamily: 'var(--font-mono)', color: T.textMuted, textTransform: 'uppercase' }}>
-                        Location
-                      </div>
-                      <div style={{ fontSize: 12, color: T.textPrimary, fontWeight: 500, marginTop: 2 }}>
-                        {lead.location}
-                      </div>
-                    </div>
-
-                    <div>
-                      <div style={{ fontSize: 10.5, fontFamily: 'var(--font-mono)', color: T.textMuted, textTransform: 'uppercase' }}>
-                        Site Visit Slot
-                      </div>
-                      <div style={{ fontSize: 12, color: lead.siteVisitSlot !== '—' ? T.green : T.textSecondary, fontWeight: 600, marginTop: 2 }}>
-                        {lead.siteVisitSlot}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* AI Conversation Summary */}
-                  <div style={{ marginBottom: 14 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                      <Activity size={12} color={T.brass} />
-                      <span style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: T.textSecondary, textTransform: 'uppercase', fontWeight: 600 }}>
-                        AI Call Summary
-                      </span>
-                    </div>
-                    <p
-                      style={{
-                        fontSize: 12.5,
-                        color: T.textSecondary,
-                        lineHeight: 1.55,
-                        margin: 0,
-                        background: 'rgba(0,0,0,0.2)',
-                        padding: '10px 12px',
-                        borderRadius: 10,
-                        border: `1px solid ${T.border}`,
-                      }}
-                    >
-                      {isExpanded ? lead.summary : lead.summary.length > 180 ? `${lead.summary.slice(0, 180)}...` : lead.summary}
-                      {lead.summary.length > 180 && (
+                  {/* Row 3: AI Call Summary (Clean expandable quote) */}
+                  {lead.summary && (
+                    <div style={{
+                      fontSize: 11.5,
+                      color: T.textSecondary,
+                      background: 'rgba(12,21,36,0.6)',
+                      borderLeft: `2px solid ${T.brass}`,
+                      padding: '6px 10px',
+                      borderRadius: 4,
+                      lineHeight: 1.45,
+                    }}>
+                      {isExpanded ? lead.summary : lead.summary.length > 140 ? `${lead.summary.slice(0, 140)}...` : lead.summary}
+                      {lead.summary.length > 140 && (
                         <button
                           onClick={() => setExpandedSummaryId(isExpanded ? null : lead.callId)}
                           style={{
                             background: 'none',
                             border: 'none',
-                            color: T.accentGlow,
-                            fontSize: 11.5,
+                            color: T.brass,
+                            fontSize: 11,
                             fontWeight: 600,
                             cursor: 'pointer',
-                            marginLeft: 6,
+                            marginLeft: 4,
                             padding: 0,
                           }}
                         >
-                          {isExpanded ? 'Show less' : 'Read full summary'}
+                          {isExpanded ? 'Less' : 'Read full'}
                         </button>
                       )}
-                    </p>
-                  </div>
-
-                  {/* Bottom Strip: Duration, Sentiment & Audio Player */}
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      borderTop: `1px solid ${T.border}`,
-                      paddingTop: 12,
-                      flexWrap: 'wrap',
-                      gap: 10,
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11.5, color: T.textMuted, fontFamily: 'var(--font-mono)' }}>
-                        <Clock size={12} /> {Math.floor(lead.durationSecs / 60)}m {lead.durationSecs % 60}s
-                      </span>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11.5, color: T.textMuted, fontFamily: 'var(--font-mono)' }}>
-                        Sentiment: <span style={{ color: lead.sentiment === 'positive' ? T.green : lead.sentiment === 'negative' ? T.red : T.textSecondary, textTransform: 'capitalize' }}>{lead.sentiment}</span>
-                      </span>
                     </div>
+                  )}
 
-                    {/* Audio Recording Button */}
+                  {/* Row 4: Inline Audio Play Pill, Sentiment & Call ID */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    background: T.deepNavy,
+                    border: `1px solid ${T.border}`,
+                    borderRadius: 8,
+                    padding: '6px 10px',
+                    flexWrap: 'wrap',
+                    gap: 8,
+                  }}>
+                    {/* 1-Tap Audio Play Pill */}
                     <button
                       onClick={e => toggleAudio(lead.callId, e)}
                       disabled={loadingAudioId === lead.callId}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 6,
-                        background: isPlaying ? T.greenSoft : T.surface,
-                        border: `1px solid ${isPlaying ? T.green : T.borderStrong}`,
-                        color: isPlaying ? T.green : T.textSecondary,
-                        borderRadius: 20,
-                        padding: '5px 12px',
-                        fontSize: 11.5,
+                        gap: 5,
+                        background: isPlaying ? T.green : T.greenSoft,
+                        color: isPlaying ? '#0C1524' : T.green,
+                        border: `1px solid rgba(79,190,135,0.4)`,
+                        borderRadius: 12,
+                        padding: '3px 9px',
                         fontFamily: 'var(--font-mono)',
+                        fontSize: 10.5,
+                        fontWeight: 700,
                         cursor: 'pointer',
-                        transition: 'all 0.2s',
+                        transition: 'all 0.15s',
                       }}
                     >
                       {loadingAudioId === lead.callId ? (
-                        <span>Loading audio...</span>
+                        <span>Loading...</span>
                       ) : isPlaying ? (
                         <>
-                          <Pause size={12} /> Playing Audio
+                          <Pause size={11} /> 0m {lead.durationSecs % 60}s Pause
                         </>
                       ) : (
                         <>
-                          <Volume2 size={12} color={T.brass} /> Listen to Call
+                          <Play size={11} fill="currentColor" /> {Math.floor(lead.durationSecs / 60)}m {lead.durationSecs % 60}s Play
                         </>
                       )}
                     </button>
+
+                    {/* Sentiment */}
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: T.textSecondary, display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: lead.sentiment === 'positive' ? T.green : lead.sentiment === 'negative' ? T.red : T.textMuted }} />
+                      <span style={{ textTransform: 'capitalize' }}>{lead.sentiment}</span>
+                    </span>
+
+                    {/* Copy ID */}
+                    <div
+                      onClick={e => copyCallId(lead.callId, e)}
+                      title="Click to copy Call ID"
+                      style={{
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: 10.5,
+                        color: copiedId === lead.callId ? T.green : T.textMuted,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 3,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <span>#{lead.callId.slice(0, 6)}</span>
+                      {copiedId === lead.callId ? <Check size={11} /> : <Copy size={11} />}
+                    </div>
                   </div>
 
-                  {/* Inline Audio Player if active */}
+                  {/* Inline Active Audio Stream */}
                   {isPlaying && audioSrc && (
-                    <div style={{ marginTop: 12, background: T.deepNavy, borderRadius: 10, padding: '8px 12px', border: `1px solid ${T.green}` }}>
+                    <div style={{ background: T.deepNavy, borderRadius: 8, padding: '6px 8px', border: `1px solid ${T.green}` }}>
                       <audio
                         src={audioSrc}
                         controls
                         autoPlay
                         onEnded={() => setPlayingAudioId(null)}
-                        style={{ width: '100%', height: 32 }}
+                        style={{ width: '100%', height: 28 }}
                       />
                     </div>
                   )}

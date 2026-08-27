@@ -11,8 +11,9 @@
  * The token is cached in memory for the lifetime of the browser tab.
  */
 
-// Use relative URL in local dev (via Vite proxy). In production, fallback to VITE_API_BASE_URL.
-const API_BASE = ((import.meta.env.VITE_CLIENT_API_URL || import.meta.env.VITE_API_BASE_URL || '') as string).replace(/\/+$/, '')
+// Production: VITE_API_BASE_URL → https://wakilz-voice-635406175951.asia-south1.run.app
+// Local dev: empty string → Vite proxy forwards /api/* to localhost:8080
+const API_BASE = ((import.meta.env.VITE_API_BASE_URL || '') as string).replace(/\/+$/, '')
 
 const CLIENT_KEY = 'wakilz_demo'
 
