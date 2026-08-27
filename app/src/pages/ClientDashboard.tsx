@@ -98,12 +98,18 @@ function StatCard({ icon: Icon, label, value, sub, tone = 'default', badge, onCl
     <div
       onClick={onClick}
       style={{
-        background: T.surface, borderRadius: 16, padding: 'clamp(12px, 1.8vw, 18px)',
-        border: `1px solid ${T.border}`, display: 'flex', flexDirection: 'column',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.2)', transition: 'transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease',
+        background: T.surface,
+        borderRadius: 16,
+        padding: '12px 14px',
+        border: `1px solid ${T.border}`,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+        transition: 'transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease',
         cursor: onClick ? 'pointer' : 'default',
         position: 'relative',
-        overflow: 'hidden',
+        minHeight: 114,
       }}
       onMouseEnter={e => {
         e.currentTarget.style.borderColor = T.brass
@@ -113,32 +119,66 @@ function StatCard({ icon: Icon, label, value, sub, tone = 'default', badge, onCl
       onMouseLeave={e => {
         e.currentTarget.style.borderColor = T.border
         e.currentTarget.style.transform = 'translateY(0)'
-        e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.2)'
+        e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.2)'
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 28, height: 28, borderRadius: 8, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Icon size={14} color={fg} />
-          </div>
-          <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 500, color: T.textSecondary, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {label}
-          </span>
+      {/* Row 1: Icon on left, Badge cleanly on right */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+        <div style={{ width: 30, height: 30, borderRadius: 8, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <Icon size={15} color={fg} />
         </div>
         {badge && (
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9.5, fontWeight: 700, color: fg, background: bg, padding: '2px 6px', borderRadius: 8 }}>
+          <span style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: 10,
+            fontWeight: 700,
+            color: fg,
+            background: bg,
+            border: `1px solid ${bg}`,
+            padding: '2px 7px',
+            borderRadius: 6,
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+          }}>
             {badge}
           </span>
         )}
       </div>
 
-      <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(20px, 2.4vw, 30px)', color: fg, fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.02em', margin: '4px 0 6px' }}>
-        {value}
+      {/* Row 2: Value & Label */}
+      <div>
+        <div style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 'clamp(22px, 3vw, 28px)',
+          color: fg,
+          fontWeight: 700,
+          lineHeight: 1.1,
+          letterSpacing: '-0.02em',
+          margin: '2px 0 2px',
+        }}>
+          {value}
+        </div>
+        <div style={{
+          fontFamily: 'var(--font-body)',
+          fontSize: 12,
+          fontWeight: 600,
+          color: T.textSecondary,
+          lineHeight: 1.25,
+        }}>
+          {label}
+        </div>
       </div>
 
+      {/* Row 3: Subtext */}
       {sub && (
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textMuted, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 4 }}>
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>{sub}</span>
+        <div style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: 10.5,
+          color: T.textMuted,
+          marginTop: 4,
+          lineHeight: 1.3,
+        }}>
+          {sub}
         </div>
       )}
     </div>
