@@ -575,7 +575,7 @@ export default function ClientPreviewPage() {
                     label="Calls Dialed"
                     tone="default"
                     value={data.stats.totalCalls.toLocaleString('en-IN')}
-                    sub={`${data.stats.answeredCalls} answered · ${formatDuration(data.stats.avgDurationSecs)} avg`}
+                    sub={`${data.stats.answeredCalls} connected (${data.stats.connectRate}%)`}
                     badge="+12%"
                     onClick={() => openDrawer(
                       'All Dialed Calls',
@@ -589,7 +589,7 @@ export default function ClientPreviewPage() {
                     label="Qualified Leads"
                     tone="green"
                     value={data.stats.qualifiedLeads.toLocaleString('en-IN')}
-                    sub={`${data.stats.qualifiedRate}% qualification rate`}
+                    sub={`${data.stats.qualifiedRate}% of connected`}
                     badge={`${data.stats.qualifiedRate}% rate`}
                     onClick={() => openDrawer(
                       'Qualified Leads',
@@ -603,7 +603,7 @@ export default function ClientPreviewPage() {
                     label="Site Visits Booked"
                     tone="brass"
                     value={data.stats.visitsBooked.toLocaleString('en-IN')}
-                    sub={`${data.stats.visitBookedRate}% of qualified leads`}
+                    sub={`${data.stats.visitsBooked} of ${data.stats.qualifiedLeads} qualified`}
                     badge={`${data.stats.visitBookedRate}% conv`}
                     onClick={() => openDrawer(
                       'Site Visits Booked',
