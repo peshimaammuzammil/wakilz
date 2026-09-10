@@ -116,10 +116,10 @@ import rasenSnapshot from './rasen_calls_snapshot.json'
 
 function getSnapshotCallsForAgent(agentId?: string): RasenCall[] {
   if (!agentId) return []
-  if (agentId === '100e45db-af96-4309-a7b9-0165b283f354') {
+  if (agentId === '100e45db-af96-4309-a7b9-0165b283f354' || agentId.startsWith('100e45db')) {
     return ((rasenSnapshot as any).cs_turf || []) as RasenCall[]
   }
-  if (agentId === 'cd649bcb-ef67-47b8-a621-0a6311a221f7') {
+  if (agentId === 'cd649bcb-ae20-4783-8193-9baae79203b7' || agentId.startsWith('cd649bcb')) {
     return ((rasenSnapshot as any).booking_agent || []) as RasenCall[]
   }
   return []
