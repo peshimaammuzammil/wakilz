@@ -15,7 +15,12 @@
 // Local dev: empty string → Vite proxy forwards /api/* to localhost:8080
 const API_BASE = ((import.meta.env.VITE_API_BASE_URL || '') as string).replace(/\/+$/, '')
 
-const CLIENT_KEY = 'wakilz_demo'
+let CLIENT_KEY = 'wakilz_demo'
+
+export function setClientKey(key: string) {
+  CLIENT_KEY = key
+  clearClientToken() // Force re-fetch token for new client
+}
 
 // In-memory JWT cache — refreshes on page reload
 let _cachedToken: string | null = null
@@ -112,6 +117,7 @@ export async function fetchRasenCalls(
   endDate?: string,
   maxCalls = 200,
   includeAnalysis = true,
+  agentId?: string,
 ): Promise<RasenCallsResponse> {
   const params = new URLSearchParams({
     max_calls: String(maxCalls),
@@ -119,6 +125,7 @@ export async function fetchRasenCalls(
   })
   if (startDate) params.set('start_date', startDate)
   if (endDate) params.set('end_date', endDate)
+  if (agentId) params.set('agent_id', agentId)
 
   const res = await _authedFetch(`${API_BASE}/api/rasen/calls?${params}`)
   if (!res.ok) {
@@ -277,3 +284,168 @@ export async function triggerTestCall(payload: TestCallPayload): Promise<any> {
   }
   return res.json()
 }
+
+/**
+ * Fetch a single call by ID — searches /api/rasen/calls list (always deployed).
+ * Falls back gracefully; never throws.
+ */
+export async function fetchCallById(callId: string): Promise<any | null> {
+  try {
+    // Try direct endpoint first (available after backend redeploy)
+    const direct = await _authedFetch(`${API_BASE}/api/rasen/calls/${callId}`)
+    if (direct.ok) return await direct.json()
+  } catch (_) {}
+
+  // Fallback: search the list — always works on deployed backend
+  try {
+    const listRes = await _authedFetch(`${API_BASE}/api/rasen/calls?max_calls=50&include_analysis=true`)
+    if (listRes.ok) {
+      const data = await listRes.json()
+      const match = (data.calls || []).find((c: any) => c.id === callId)
+      if (match) return match
+    }
+  } catch (_) {}
+
+  return null
+}
+
+/**
+ * Fetch full call analysis (transcript + extraction).
+ * Tries /analysis endpoint first, falls back to list search.
+ */
+export async function fetchCallAnalysisFull(callId: string): Promise<{
+  transcript: any[]
+  extraction: Record<string, any>
+  status: string
+  recording_url?: string
+  _raw?: any
+}> {
+  // Try direct analysis endpoint (available after backend redeploy)
+  try {
+    const res = await _authedFetch(`${API_BASE}/api/rasen/calls/${callId}/analysis`)
+    if (res.ok) {
+      const d = await res.json()
+
+      // Transcript: available from analysis endpoint post-call
+      const transcript =
+        d.transcript ??
+        d.turns ??
+        d.conversation_turns ??
+        d.messages ??
+        []
+
+      // Extraction: Rasen returns {fields: [{id, name, value, ...}]}
+      // Convert to a flat {name: value} map for UI consumption
+      const rawEx = d.extraction || {}
+      const extraction: Record<string, any> = {}
+      if (Array.isArray(rawEx.fields)) {
+        for (const f of rawEx.fields) {
+          if (f.name !== undefined) extraction[f.name] = f.value ?? ''
+          if (f.id !== undefined && !extraction[f.id]) extraction[f.id] = f.value ?? ''
+        }
+      }
+      // Also handle legacy {data: {...}} format
+      if (rawEx.data && typeof rawEx.data === 'object') {
+        Object.assign(extraction, rawEx.data)
+      }
+
+      return {
+        transcript,
+        extraction,
+        status: rawEx.status ?? d.extraction?.status ?? d.status ?? 'unknown',
+        recording_url: d.recording_url,
+        _raw: d,
+      }
+    }
+  } catch (_) {}
+
+  // Fallback: get from list (extraction only, no transcript until backend redeploy)
+  try {
+    const match = await fetchCallById(callId)
+    if (match) {
+      const transcript =
+        match.transcript ??
+        match.turns ??
+        match.conversation_turns ??
+        []
+
+      return {
+        transcript,
+        extraction: match.extraction || {},
+        status: match.detailed_status || match.status || 'unknown',
+        recording_url: match.recording_url,
+        _raw: match,
+      }
+    }
+  } catch (_) {}
+
+  return { transcript: [], extraction: {}, status: 'unknown' }
+}
+
+/**
+ * Poll live transcript utterances for an active (or recently ended) call.
+ *
+ * Uses the dedicated Rasen transcript endpoint (NOT /analysis).
+ * Items have: { id, role: "user"|"assistant", text, is_final, ... }
+ *
+ * Usage:
+ *   let afterId = 0
+ *   const { items, next_after_id, stream_complete } = await fetchLiveTranscript(callId, afterId)
+ *   afterId = next_after_id
+ *   // repeat until stream_complete === true
+ */
+export async function fetchLiveTranscript(
+  callId: string,
+  afterId: number = 0,
+  limit: number = 200,
+): Promise<{
+  call_id: string
+  status: string
+  items: Array<{
+    id: number
+    role: 'user' | 'assistant'
+    text: string
+    is_final: boolean
+    interrupted: boolean
+    language: string | null
+    offset_ms: number | null
+    created_at: string
+  }>
+  next_after_id: number
+  stream_complete: boolean
+}> {
+  try {
+    const res = await _authedFetch(
+      `${API_BASE}/api/rasen/calls/${callId}/transcript?after_id=${afterId}&limit=${limit}`
+    )
+    if (res.ok) return await res.json()
+  } catch (_) {}
+  return { call_id: callId, status: 'unknown', items: [], next_after_id: afterId, stream_complete: false }
+}
+
+/**
+ * Send hangup signal. Tries direct endpoint first, then batch cancel.
+ */
+export async function sendHangup(callId: string): Promise<void> {
+  // Try direct hangup (available after backend redeploy)
+  try {
+    const res = await _authedFetch(`${API_BASE}/api/rasen/calls/${callId}/hangup`, { method: 'POST' })
+    if (res.ok) return
+  } catch (_) {}
+
+  // Fallback: attempt batch cancel (unlikely to match but harmless)
+  try {
+    await _authedFetch(`${API_BASE}/api/rasen/batch-calls/${callId}/cancel`, { method: 'POST' })
+  } catch (_) {}
+}
+
+/** @deprecated Use fetchCallById / fetchCallAnalysisFull / sendHangup instead */
+export async function fetchCallRecording(callId: string): Promise<{ url: string; call_id: string }> {
+  try {
+    const res = await _authedFetch(`${API_BASE}/api/rasen/calls/${callId}/recording`)
+    if (res.ok) return await res.json()
+  } catch (_) {}
+  return { url: '', call_id: callId }
+}
+
+

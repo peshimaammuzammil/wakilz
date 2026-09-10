@@ -24,6 +24,7 @@ import {
 import { useClientDashboard, type LeadRow } from '@/hooks/useClientDashboard'
 import LeadDetailsDrawer from '@/components/client/LeadDetailsDrawer'
 import OutboundCampaignsView from '@/components/client/OutboundCampaignsView'
+import TestCallStudioView from '@/components/client/TestCallStudioView'
 
 // ── Design Tokens (Wakilz dark luxury theme) ─────────────────────────────────
 const T = {
@@ -197,7 +198,7 @@ function SkeletonCard() {
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export default function ClientPreviewPage() {
-  const [activeTab, setActiveTab] = useState<'analytics' | 'outbound'>('analytics')
+  const [activeTab, setActiveTab] = useState<'analytics' | 'outbound' | 'test_call'>('analytics')
 
   // Date filters
   const today = new Date().toISOString().slice(0, 10)
@@ -312,7 +313,7 @@ export default function ClientPreviewPage() {
                 transition: 'all 0.15s',
               }}
             >
-              <span>📊</span> Analytics & Leads
+              <span>📊</span> Analytics
             </button>
 
             <button
@@ -333,7 +334,28 @@ export default function ClientPreviewPage() {
                 transition: 'all 0.15s',
               }}
             >
-              <span>📞</span> Outbound Campaigns
+              <span>📞</span> Outbound
+            </button>
+
+            <button
+              id="tab-test-call"
+              onClick={() => setActiveTab('test_call')}
+              style={{
+                background: activeTab === 'test_call' ? 'rgba(229, 192, 123, 0.14)' : 'transparent',
+                color: activeTab === 'test_call' ? T.brass : T.textSecondary,
+                border: activeTab === 'test_call' ? `1px solid ${T.brass}` : 'none',
+                borderRadius: 9,
+                padding: '5px 14px',
+                fontSize: 12,
+                fontWeight: activeTab === 'test_call' ? 700 : 400,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                transition: 'all 0.15s',
+              }}
+            >
+              <span>🧪</span> Test Call
             </button>
           </div>
 
@@ -395,7 +417,7 @@ export default function ClientPreviewPage() {
             borderRadius: 12,
             padding: 3,
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
+            gridTemplateColumns: '1fr 1fr 1fr',
             gap: 4,
           }}>
             <button
@@ -412,7 +434,7 @@ export default function ClientPreviewPage() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 6,
+                gap: 4,
                 boxShadow: activeTab === 'analytics' ? '0 2px 8px rgba(0,0,0,0.3)' : 'none',
               }}
             >
@@ -432,7 +454,7 @@ export default function ClientPreviewPage() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 6,
+                gap: 4,
                 boxShadow: activeTab === 'outbound' ? '0 2px 8px rgba(0,0,0,0.3)' : 'none',
               }}
             >
@@ -840,6 +862,11 @@ export default function ClientPreviewPage() {
         {/* TAB 2: OUTBOUND CAMPAIGNS */}
         {activeTab === 'outbound' && (
           <OutboundCampaignsView />
+        )}
+
+        {/* TAB 3: TEST CALL STUDIO */}
+        {activeTab === 'test_call' && (
+          <TestCallStudioView userRole="admin" />
         )}
       </main>
 

@@ -132,11 +132,11 @@ export function useVoiceAgent(): UseVoiceAgentReturn {
       }
       localStream.getTracks().forEach(track => pc.addTrack(track, localStream))
 
-      // ── Step 3: Signal via Pipecat ────────────────────────────────────────
+      // ── Step 3: Signal ────────────────────────────────────────────────────
       const offer = await pc.createOffer()
       await pc.setLocalDescription(offer)
 
-      // A. Call /start to obtain a sessionId
+      // A. Call /start to obtain a sessionId (while ICE gathers in background)
       const startRes = await fetch(`${BACKEND_URL}/start`, {
         method: 'POST',
         headers: {
@@ -150,11 +150,21 @@ export function useVoiceAgent(): UseVoiceAgentReturn {
       })
 
       if (!startRes.ok) {
-        throw new Error(`Pipecat /start returned ${startRes.status}`)
+        throw new Error(`/start returned ${startRes.status}`)
       }
       const { sessionId } = await startRes.json() as { sessionId: string }
 
-      // B. Call /sessions/{sessionId}/api/offer to send offer and get SDP answer
+      // B. Wait for ICE gathering to finish so localDescription.sdp contains candidates.
+      //    Without this the backend receives a candidate-less SDP and the connection never establishes.
+      await new Promise<void>((resolve) => {
+        if (pc.iceGatheringState === 'complete') { resolve(); return }
+        const t = setTimeout(resolve, 4000) // 4 s max — proceed anyway
+        pc.onicegatheringstatechange = () => {
+          if (pc.iceGatheringState === 'complete') { clearTimeout(t); resolve() }
+        }
+      })
+
+      // C. Send the complete offer (with ICE candidates) and get SDP answer
       const offerRes = await fetch(`${BACKEND_URL}/sessions/${sessionId}/api/offer`, {
         method: 'POST',
         headers: {
@@ -162,8 +172,8 @@ export function useVoiceAgent(): UseVoiceAgentReturn {
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          sdp: offer.sdp,
-          type: offer.type,
+          sdp: pc.localDescription!.sdp,   // ← localDescription has ICE candidates; offer.sdp does not
+          type: pc.localDescription!.type as string,
         }),
       })
 

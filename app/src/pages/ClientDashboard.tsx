@@ -10,7 +10,7 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link, useNavigate, useSearchParams } from 'react-router'
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid,
@@ -23,8 +23,10 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useClientDashboard, type LeadRow } from '@/hooks/useClientDashboard'
+import { fetchAgents, setClientKey, type RasenAgent } from '@/lib/clientApi'
 import LeadDetailsDrawer from '@/components/client/LeadDetailsDrawer'
 import OutboundCampaignsView from '@/components/client/OutboundCampaignsView'
+import TestCallStudioView from '@/components/client/TestCallStudioView'
 
 // ── Design Tokens (Wakilz dark luxury theme) ─────────────────────────────────
 const T = {
@@ -54,9 +56,14 @@ const T = {
 function Card({ children, style, id }: { children: React.ReactNode; style?: React.CSSProperties; id?: string }) {
   return (
     <div id={id} style={{
-      background: T.surface, border: `1px solid ${T.border}`, borderRadius: 18,
-      padding: 'clamp(14px, 2.2vw, 24px)', boxShadow: '0 12px 32px rgba(0,0,0,0.25)',
-      backdropFilter: 'blur(20px)', ...style,
+      background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%), rgba(18, 28, 45, 0.65)',
+      border: '1px solid rgba(255, 255, 255, 0.10)',
+      borderRadius: 20,
+      padding: 'clamp(14px, 2.2vw, 24px)',
+      boxShadow: '0 12px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12)',
+      backdropFilter: 'blur(24px) saturate(180%)',
+      WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+      ...style,
     }}>
       {children}
     </div>
@@ -93,39 +100,43 @@ function StatCard({ icon: Icon, label, value, sub, tone = 'default', badge, onCl
   tone?: 'default' | 'brass' | 'green' | 'accent'; badge?: string; onClick?: () => void
 }) {
   const fg = tone === 'green' ? T.green : tone === 'brass' ? T.brass : tone === 'accent' ? T.accentGlow : T.textPrimary
-  const bg = tone === 'green' ? T.greenSoft : tone === 'brass' ? T.brassSoft : 'rgba(90,108,255,0.12)'
+  const bg = tone === 'green' ? 'rgba(79, 190, 135, 0.15)' : tone === 'brass' ? 'rgba(229, 192, 123, 0.15)' : 'rgba(90, 108, 255, 0.15)'
+  const iconBorder = tone === 'green' ? 'rgba(79, 190, 135, 0.3)' : tone === 'brass' ? 'rgba(229, 192, 123, 0.3)' : 'rgba(90, 108, 255, 0.3)'
+  
   return (
     <div
       onClick={onClick}
       style={{
-        background: T.surface,
-        borderRadius: 16,
-        padding: '12px 14px',
-        border: `1px solid ${T.border}`,
+        background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.015) 100%), rgba(18, 28, 46, 0.65)',
+        borderRadius: 18,
+        padding: '14px 16px',
+        border: '1px solid rgba(255, 255, 255, 0.10)',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
-        transition: 'transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease',
+        boxShadow: '0 8px 30px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255, 255, 255, 0.14)',
+        backdropFilter: 'blur(24px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+        transition: 'transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
         cursor: onClick ? 'pointer' : 'default',
         position: 'relative',
-        minHeight: 114,
+        minHeight: 116,
       }}
       onMouseEnter={e => {
-        e.currentTarget.style.borderColor = T.brass
-        e.currentTarget.style.transform = 'translateY(-2px)'
-        e.currentTarget.style.boxShadow = '0 12px 28px rgba(0,0,0,0.35)'
+        e.currentTarget.style.borderColor = 'rgba(229, 192, 123, 0.5)'
+        e.currentTarget.style.transform = 'translateY(-3px)'
+        e.currentTarget.style.boxShadow = '0 16px 36px rgba(0,0,0,0.45), 0 0 20px rgba(229,192,123,0.15), inset 0 1px 0 rgba(255, 255, 255, 0.25)'
       }}
       onMouseLeave={e => {
-        e.currentTarget.style.borderColor = T.border
+        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.10)'
         e.currentTarget.style.transform = 'translateY(0)'
-        e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.2)'
+        e.currentTarget.style.boxShadow = '0 8px 30px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255, 255, 255, 0.14)'
       }}
     >
       {/* Row 1: Icon on left, Badge cleanly on right */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-        <div style={{ width: 30, height: 30, borderRadius: 8, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          <Icon size={15} color={fg} />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+        <div style={{ width: 32, height: 32, borderRadius: 10, background: bg, border: `1px solid ${iconBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: `0 2px 10px ${bg}` }}>
+          <Icon size={16} color={fg} />
         </div>
         {badge && (
           <span style={{
@@ -134,9 +145,9 @@ function StatCard({ icon: Icon, label, value, sub, tone = 'default', badge, onCl
             fontWeight: 700,
             color: fg,
             background: bg,
-            border: `1px solid ${bg}`,
-            padding: '2px 7px',
-            borderRadius: 6,
+            border: `1px solid ${iconBorder}`,
+            padding: '2px 8px',
+            borderRadius: 7,
             whiteSpace: 'nowrap',
             flexShrink: 0,
           }}>
@@ -149,9 +160,9 @@ function StatCard({ icon: Icon, label, value, sub, tone = 'default', badge, onCl
       <div>
         <div style={{
           fontFamily: 'var(--font-display)',
-          fontSize: 'clamp(22px, 3vw, 28px)',
+          fontSize: 'clamp(22px, 3.2vw, 30px)',
           color: fg,
-          fontWeight: 700,
+          fontWeight: 800,
           lineHeight: 1.1,
           letterSpacing: '-0.02em',
           margin: '2px 0 2px',
@@ -160,7 +171,7 @@ function StatCard({ icon: Icon, label, value, sub, tone = 'default', badge, onCl
         </div>
         <div style={{
           fontFamily: 'var(--font-body)',
-          fontSize: 12,
+          fontSize: 12.5,
           fontWeight: 600,
           color: T.textSecondary,
           lineHeight: 1.25,
@@ -175,8 +186,11 @@ function StatCard({ icon: Icon, label, value, sub, tone = 'default', badge, onCl
           fontFamily: 'var(--font-mono)',
           fontSize: 10.5,
           color: T.textMuted,
-          marginTop: 4,
+          marginTop: 5,
           lineHeight: 1.3,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
         }}>
           {sub}
         </div>
@@ -200,7 +214,9 @@ function SkeletonCard() {
 export default function ClientDashboard() {
   const { user, profile, logOut } = useAuth()
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState<'analytics' | 'outbound'>('analytics')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const clientQuery = searchParams.get('client') || 'wakilz_demo'
+  const [activeTab, setActiveTab] = useState<'analytics' | 'outbound' | 'test_call'>('analytics')
   const [profileOpen, setProfileOpen] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
 
@@ -208,9 +224,41 @@ export default function ClientDashboard() {
   const today = new Date().toISOString().slice(0, 10)
   const monthStart = today.slice(0, 7) + '-01'
 
-  const [timePreset, setTimePreset] = useState<'7d' | '30d' | 'month' | 'custom'>('month')
-  const [fromDate, setFromDate] = useState<string>(monthStart)
+  const [timePreset, setTimePreset] = useState<'1d' | '7d' | '30d' | 'month' | 'all' | 'custom'>('all')
+  const [fromDate, setFromDate] = useState<string>('')
   const [toDate, setToDate] = useState<string>(today)
+
+  const [agents, setAgents] = useState<RasenAgent[]>([])
+  const [selectedAgentId, setSelectedAgentId] = useState<string>('')
+
+  useEffect(() => {
+    // If admin is viewing a specific client, update the global api key context
+    if (profile?.role === 'admin' && clientQuery) {
+      setClientKey(clientQuery)
+    }
+    
+    fetchAgents()
+      .then(res => {
+        const sorted = [...res].sort((a, b) => {
+          const dateA = new Date(a.published_at || (a as any).created_at || 0).getTime()
+          const dateB = new Date(b.published_at || (b as any).created_at || 0).getTime()
+          return dateB - dateA
+        })
+        setAgents(sorted)
+        if (sorted.length > 0) {
+          setSelectedAgentId(prev => {
+            if (prev && sorted.some(a => a.id === prev)) return prev
+            return sorted[0].id
+          })
+        }
+      })
+      .catch(err => console.error('Failed to fetch agents:', err))
+  }, [clientQuery, profile?.role])
+
+  // Selected agent name and domain checks
+  const selectedAgent = agents.find(a => a.id === selectedAgentId)
+  const isCsTurf = selectedAgent?.name === 'CS-turf'
+  const isSportzone = selectedAgent?.name === 'Booking Agent'
 
   // Close profile dropdown on outside click
   useEffect(() => {
@@ -227,6 +275,8 @@ export default function ClientDashboard() {
   const { data, loading, error, refresh } = useClientDashboard({
     startDate: fromDate,
     endDate: toDate,
+    agentId: selectedAgentId,
+    agentName: selectedAgent?.name,
   })
 
   // Drawer state for Lead Intelligence
@@ -334,7 +384,7 @@ export default function ClientDashboard() {
                 transition: 'all 0.15s',
               }}
             >
-              <span>📊</span> Analytics & Leads
+              <span>📊</span> Analytics
             </button>
 
             <button
@@ -355,7 +405,28 @@ export default function ClientDashboard() {
                 transition: 'all 0.15s',
               }}
             >
-              <span>📞</span> Outbound Campaigns
+              <span>📞</span> Outbound
+            </button>
+
+            <button
+              id="tab-test-call"
+              onClick={() => setActiveTab('test_call')}
+              style={{
+                background: activeTab === 'test_call' ? 'rgba(229, 192, 123, 0.14)' : 'transparent',
+                color: activeTab === 'test_call' ? T.brass : T.textSecondary,
+                border: activeTab === 'test_call' ? `1px solid ${T.brass}` : 'none',
+                borderRadius: 9,
+                padding: '5px 14px',
+                fontSize: 12,
+                fontWeight: activeTab === 'test_call' ? 700 : 400,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                transition: 'all 0.15s',
+              }}
+            >
+              <span>🧪</span> Test Call
             </button>
           </div>
 
@@ -475,7 +546,7 @@ export default function ClientDashboard() {
             borderRadius: 12,
             padding: 3,
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
+            gridTemplateColumns: '1fr 1fr 1fr',
             gap: 4,
           }}>
             <button
@@ -492,7 +563,7 @@ export default function ClientDashboard() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 6,
+                gap: 4,
                 boxShadow: activeTab === 'analytics' ? '0 2px 8px rgba(0,0,0,0.3)' : 'none',
               }}
             >
@@ -512,11 +583,31 @@ export default function ClientDashboard() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 6,
+                gap: 4,
                 boxShadow: activeTab === 'outbound' ? '0 2px 8px rgba(0,0,0,0.3)' : 'none',
               }}
             >
               <span>📞</span> Outbound
+            </button>
+            <button
+              onClick={() => setActiveTab('test_call')}
+              style={{
+                background: activeTab === 'test_call' ? 'rgba(229, 192, 123, 0.14)' : 'transparent',
+                color: activeTab === 'test_call' ? T.brass : T.textSecondary,
+                border: activeTab === 'test_call' ? `1px solid ${T.brass}` : 'none',
+                borderRadius: 9,
+                padding: '6px',
+                fontSize: 12,
+                fontWeight: activeTab === 'test_call' ? 700 : 400,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 4,
+                boxShadow: activeTab === 'test_call' ? '0 2px 8px rgba(229, 192, 123, 0.25)' : 'none',
+              }}
+            >
+              <span>🧪</span> Test Call
             </button>
           </div>
         </div>
@@ -525,81 +616,207 @@ export default function ClientDashboard() {
       {/* ── Main Container ── */}
       <main style={{ maxWidth: 1360, margin: '0 auto', padding: 'clamp(12px, 2vw, 24px) 16px' }}>
 
+        {/* ── Error Banner ── */}
+        {error && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', background: T.redSoft, border: `1px solid rgba(248,113,113,0.3)`, borderRadius: 12, marginBottom: 14 }}>
+            <AlertCircle size={16} color={T.red} style={{ flexShrink: 0 }} />
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: T.red }}>Connection Notice</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textSecondary, marginTop: 1 }}>{error}</div>
+            </div>
+          </div>
+        )}
+
+        {/* ── 2. Unified Luxury Glassmorphic Scope Header (Visible on all tabs) ── */}
+        <section style={{ marginBottom: 14 }}>
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.015) 100%), rgba(16, 25, 42, 0.70)',
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+            borderRadius: 16,
+            padding: '6px 10px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255, 255, 255, 0.14)',
+            backdropFilter: 'blur(24px) saturate(190%)',
+            WebkitBackdropFilter: 'blur(24px) saturate(190%)',
+          }}>
+            {/* Left: Breadcrumb Scope Selector (Workspace › Agent) */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
+              
+              {/* Workspace Pill */}
+              {profile?.role === 'admin' ? (
+                <div style={{
+                  position: 'relative',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.10)',
+                  borderRadius: 10,
+                  padding: '6px 10px',
+                  gap: 6,
+                  maxWidth: '48%',
+                  flexShrink: 0,
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+                }}>
+                  <Building2 size={13} color={T.brass} style={{ flexShrink: 0 }} />
+                  <select
+                    value={clientQuery}
+                    onChange={e => setSearchParams({ client: e.target.value })}
+                    style={{
+                      appearance: 'none',
+                      WebkitAppearance: 'none',
+                      MozAppearance: 'none',
+                      background: 'transparent',
+                      border: 'none',
+                      color: T.textPrimary,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      outline: 'none',
+                      cursor: 'pointer',
+                      fontFamily: 'var(--font-body)',
+                      padding: '0 14px 0 0',
+                      width: '100%',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <option value="wakilz_demo" style={{ background: '#162032', color: '#F3F0EA' }}>Test</option>
+                    <option value="skyline_realty" style={{ background: '#162032', color: '#F3F0EA' }}>Skyline Realty</option>
+                  </select>
+                  <ChevronDown size={11} color={T.brass} style={{ position: 'absolute', right: 7, pointerEvents: 'none' }} />
+                </div>
+              ) : (
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.10)',
+                  borderRadius: 10,
+                  padding: '6px 10px',
+                  gap: 6,
+                  flexShrink: 0,
+                }}>
+                  <Building2 size={13} color={T.brass} />
+                  <span style={{ fontSize: 12, fontWeight: 700, color: T.textPrimary }}>Test</span>
+                </div>
+              )}
+
+              {/* Breadcrumb Separator */}
+              <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 14, fontWeight: 300, userSelect: 'none' }}>/</span>
+
+              {/* Agent (Project) Pill */}
+              <div style={{
+                position: 'relative',
+                display: 'inline-flex',
+                alignItems: 'center',
+                background: 'rgba(229,192,123,0.08)',
+                border: '1px solid rgba(229,192,123,0.25)',
+                borderRadius: 10,
+                padding: '6px 10px',
+                gap: 6,
+                minWidth: 0,
+                flex: 1,
+                boxShadow: 'inset 0 1px 0 rgba(229,192,123,0.12)',
+              }}>
+                <Sparkles size={13} color={T.brass} style={{ flexShrink: 0 }} />
+                <select
+                  value={selectedAgentId}
+                  onChange={e => setSelectedAgentId(e.target.value)}
+                  style={{
+                    appearance: 'none',
+                    WebkitAppearance: 'none',
+                    MozAppearance: 'none',
+                    background: 'transparent',
+                    border: 'none',
+                    color: T.brass,
+                    fontSize: 12,
+                    fontWeight: 700,
+                    outline: 'none',
+                    cursor: 'pointer',
+                    fontFamily: 'var(--font-body)',
+                    padding: '0 14px 0 0',
+                    width: '100%',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {agents.length === 0 && (
+                    <option value="" style={{ background: '#162032', color: '#F3F0EA' }}>
+                      Select Agent
+                    </option>
+                  )}
+                  {agents.map(a => (
+                    <option key={a.id} value={a.id} style={{ background: '#162032', color: '#F3F0EA' }}>
+                      {a.name}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown size={11} color={T.brass} style={{ position: 'absolute', right: 7, pointerEvents: 'none' }} />
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* TAB 1: ANALYTICS & LEADS */}
         {activeTab === 'analytics' && (
           <div>
-            {/* ── Error Banner ── */}
-            {error && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', background: T.redSoft, border: `1px solid rgba(248,113,113,0.3)`, borderRadius: 12, marginBottom: 16 }}>
-                <AlertCircle size={16} color={T.red} style={{ flexShrink: 0 }} />
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: T.red }}>Connection Notice</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textSecondary, marginTop: 1 }}>{error}</div>
-                </div>
-              </div>
-            )}
-
-            {/* ── 2. Compact Single-Row Filter Strip (Mobile-First) ── */}
-            <section style={{ marginBottom: 16 }}>
+            {/* Date Preset Segmented Bar (Horizontal Scroll Glass Bar) */}
+            <section style={{ marginBottom: 14 }}>
               <div className="no-scrollbar" style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 8,
+                gap: 6,
                 overflowX: 'auto',
-                paddingBottom: 4,
+                padding: '6px 0 2px',
+                WebkitOverflowScrolling: 'touch',
               }}>
-                {/* Agent scope chip */}
-                <div style={{
-                  background: T.surfaceElevated,
-                  border: `1px solid ${T.borderStrong}`,
-                  borderRadius: 10,
-                  padding: '6px 12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  whiteSpace: 'nowrap',
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: T.textPrimary,
-                  flexShrink: 0,
-                }}>
-                  <span style={{ color: T.brass }}>✨</span>
-                  <span>{clientDisplayName}</span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: T.textMuted, marginLeft: 2 }}>
-                    ({loading ? '...' : `${data?.stats.totalCalls ?? 0} calls`})
-                  </span>
-                </div>
-
-                {/* Preset filter pills */}
                 {([
+                  { key: 'all', label: 'All Time ★', from: '' },
+                  { key: '1d', label: '1D', from: today },
                   { key: '7d', label: '7D', from: new Date(Date.now() - 6 * 86400000).toISOString().slice(0, 10) },
                   { key: '30d', label: '30D', from: new Date(Date.now() - 29 * 86400000).toISOString().slice(0, 10) },
-                  { key: 'month', label: 'This Month ★', from: today.slice(0, 7) + '-01' },
+                  { key: 'month', label: 'This Month', from: today.slice(0, 7) + '-01' },
                   { key: 'custom', label: '📅 Custom', from: null },
-                ] as const).map(p => (
-                  <button
-                    key={p.key}
-                    onClick={() => {
-                      setTimePreset(p.key)
-                      if (p.from) { setFromDate(p.from); setToDate(today) }
-                    }}
-                    style={{
-                      background: timePreset === p.key ? T.brassSoft : T.surface,
-                      color: timePreset === p.key ? T.brass : T.textSecondary,
-                      border: `1px solid ${timePreset === p.key ? T.brass : T.border}`,
-                      borderRadius: 8,
-                      padding: '6px 12px',
-                      fontSize: 11.5,
-                      fontWeight: timePreset === p.key ? 700 : 500,
-                      cursor: 'pointer',
-                      whiteSpace: 'nowrap',
-                      flexShrink: 0,
-                      transition: 'all 0.15s',
-                    }}
-                  >
-                    {p.label}
-                  </button>
-                ))}
+                ] as const).map(p => {
+                  const isActive = timePreset === p.key
+                  return (
+                    <button
+                      key={p.key}
+                      onClick={() => {
+                        setTimePreset(p.key)
+                        if (p.from !== null) { setFromDate(p.from); setToDate(today) }
+                      }}
+                      style={{
+                        background: isActive
+                          ? 'linear-gradient(135deg, rgba(229,192,123,0.22), rgba(229,192,123,0.08))'
+                          : 'linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%), rgba(22,32,50,0.5)',
+                        color: isActive ? T.brass : T.textSecondary,
+                        border: `1px solid ${isActive ? 'rgba(229,192,123,0.55)' : 'rgba(255,255,255,0.09)'}`,
+                        borderRadius: 10,
+                        padding: '6px 14px',
+                        fontSize: 11,
+                        fontWeight: isActive ? 700 : 500,
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0,
+                        transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                        boxShadow: isActive
+                          ? '0 4px 16px rgba(229,192,123,0.25), inset 0 1px 0 rgba(255,255,255,0.2)'
+                          : '0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.06)',
+                        backdropFilter: 'blur(16px)',
+                        WebkitBackdropFilter: 'blur(16px)',
+                        height: 32,
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}
+                    >
+                      {p.label}
+                    </button>
+                  )
+                })}
               </div>
 
               {/* Expandable Custom Date Pickers when 'custom' is active */}
@@ -608,14 +825,17 @@ export default function ClientDashboard() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 10,
-                  background: T.surface,
-                  border: `1px solid ${T.borderStrong}`,
-                  borderRadius: 12,
+                  background: 'linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%), rgba(18, 28, 45, 0.7)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  borderRadius: 14,
                   padding: '10px 14px',
-                  marginTop: 8,
+                  marginTop: 6,
                   flexWrap: 'wrap',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
                 }}>
-                  <div style={{ flex: '1 1 120px' }}>
+                  <div style={{ flex: '1 1 130px' }}>
                     <label htmlFor="from-date" style={{ display: 'block', fontSize: 10, fontFamily: 'var(--font-mono)', color: T.textMuted, marginBottom: 2 }}>From Date</label>
                     <input
                       id="from-date"
@@ -626,7 +846,7 @@ export default function ClientDashboard() {
                     />
                   </div>
                   <span style={{ color: T.textMuted, fontSize: 12, marginTop: 14 }}>→</span>
-                  <div style={{ flex: '1 1 120px' }}>
+                  <div style={{ flex: '1 1 130px' }}>
                     <label htmlFor="to-date" style={{ display: 'block', fontSize: 10, fontFamily: 'var(--font-mono)', color: T.textMuted, marginBottom: 2 }}>To Date</label>
                     <input
                       id="to-date"
@@ -650,61 +870,181 @@ export default function ClientDashboard() {
                 <>{[0, 1, 2, 3].map(i => <SkeletonCard key={i} />)}</>
               ) : data ? (
                 <>
-                  <StatCard
-                    icon={PhoneCall}
-                    label="Calls Dialed"
-                    tone="default"
-                    value={data.stats.totalCalls.toLocaleString('en-IN')}
-                    sub={`${data.stats.answeredCalls} connected (${data.stats.connectRate}%)`}
-                    badge="+12%"
-                    onClick={() => openDrawer(
-                      'All Dialed Calls',
-                      `All ${data.stats.totalCalls} outreach calls in selected period`,
-                      data.allLeads
-                    )}
-                  />
+                  {isCsTurf ? (
+                    <>
+                      <StatCard
+                        icon={PhoneCall}
+                        label="Calls Dialed"
+                        tone="default"
+                        value={data.stats.totalCalls.toLocaleString('en-IN')}
+                        sub={`${data.stats.answeredCalls} connected (${data.stats.connectRate}%)`}
+                        badge="+15% wk"
+                        onClick={() => openDrawer(
+                          'All Outbound Calls',
+                          `All ${data.stats.totalCalls} turf owner outreach calls in selected period`,
+                          data.allLeads
+                        )}
+                      />
 
-                  <StatCard
-                    icon={Phone}
-                    label="Qualified Leads"
-                    tone="green"
-                    value={data.stats.qualifiedLeads.toLocaleString('en-IN')}
-                    sub={`${data.stats.qualifiedRate}% of connected`}
-                    badge={`${data.stats.qualifiedRate}% rate`}
-                    onClick={() => openDrawer(
-                      'Qualified Leads',
-                      `${data.stats.qualifiedLeads} high-intent buyers verified with budget, location & timeline`,
-                      data.leads
-                    )}
-                  />
+                      <StatCard
+                        icon={Phone}
+                        label="Pain Point Identified"
+                        tone="green"
+                        value={data.stats.qualifiedLeads.toLocaleString('en-IN')}
+                        sub={`${data.stats.qualifiedRate}% admitted lost calls`}
+                        badge="-15 to 25 calls"
+                        onClick={() => openDrawer(
+                          'Turf Owners With Missed Calls',
+                          `${data.stats.qualifiedLeads} turf owners who admitted losing peak evening revenue to unmanaged calls`,
+                          data.leads
+                        )}
+                      />
 
-                  <StatCard
-                    icon={CalendarCheck}
-                    label="Site Visits Booked"
-                    tone="brass"
-                    value={data.stats.visitsBooked.toLocaleString('en-IN')}
-                    sub={`${data.stats.visitsBooked} of ${data.stats.qualifiedLeads} qualified`}
-                    badge={`${data.stats.visitBookedRate}% conv`}
-                    onClick={() => openDrawer(
-                      'Site Visits Booked',
-                      `${data.stats.visitsBooked} scheduled site inspections with date/time slots`,
-                      data.allLeads.filter(l => l.status === 'Booked' || l.siteVisitSlot !== '—')
-                    )}
-                  />
+                      <StatCard
+                        icon={CalendarCheck}
+                        label="Software Demos Booked"
+                        tone="brass"
+                        value={data.stats.visitsBooked.toLocaleString('en-IN')}
+                        sub={`${data.stats.visitBookedRate}% demo conversion`}
+                        badge="High Intent"
+                        onClick={() => openDrawer(
+                          'Software Demos Booked',
+                          `${data.stats.visitsBooked} confirmed 15-minute product walk-through slots`,
+                          data.allLeads.filter(l => l.status === 'Booked' || l.siteVisitSlot !== '—')
+                        )}
+                      />
 
-                  <StatCard
-                    icon={Trophy}
-                    label="Conversations Held"
-                    tone="accent"
-                    value={data.stats.conversations.toLocaleString('en-IN')}
-                    sub={`Avg ${formatDuration(data.stats.avgDurationSecs)} duration`}
-                    badge="Engaged"
-                    onClick={() => openDrawer(
-                      'Conversations Held',
-                      `${data.stats.conversations} completed voice calls reaching discovery & intent verification`,
-                      data.allLeads.filter(l => l.durationSecs > 10)
-                    )}
-                  />
+                      <StatCard
+                        icon={Trophy}
+                        label="Conversations Held"
+                        tone="accent"
+                        value={data.stats.conversations.toLocaleString('en-IN')}
+                        sub={`Avg ${formatDuration(data.stats.avgDurationSecs)} duration`}
+                        badge="Engaged"
+                        onClick={() => openDrawer(
+                          'Conversations Held',
+                          `${data.stats.conversations} completed outbound pitch calls with turf managers`,
+                          data.allLeads.filter(l => l.durationSecs > 10)
+                        )}
+                      />
+                    </>
+                  ) : isSportzone ? (
+                    <>
+                      <StatCard
+                        icon={PhoneCall}
+                        label="Inbound Inquiries"
+                        tone="default"
+                        value={data.stats.totalCalls.toLocaleString('en-IN')}
+                        sub={`${data.stats.answeredCalls} handled with 0s hold`}
+                        badge="24/7 Live"
+                        onClick={() => openDrawer(
+                          'All Inbound Inquiries',
+                          `All ${data.stats.totalCalls} callers seeking court availability`,
+                          data.allLeads
+                        )}
+                      />
+
+                      <StatCard
+                        icon={CalendarCheck}
+                        label="Playo Links Sent"
+                        tone="green"
+                        value={data.stats.visitsBooked.toLocaleString('en-IN')}
+                        sub={`${data.stats.visitBookedRate}% link delivery rate`}
+                        badge="Automated"
+                        onClick={() => openDrawer(
+                          'Playo Links Delivered',
+                          `${data.stats.visitsBooked} direct payment and slot hold links dispatched via WhatsApp`,
+                          data.allLeads.filter(l => l.status === 'Booked' || l.siteVisitSlot !== '—')
+                        )}
+                      />
+
+                      <StatCard
+                        icon={Trophy}
+                        label="Gross Booking Value"
+                        tone="brass"
+                        value={`₹${(data.stats.visitsBooked * 1500).toLocaleString('en-IN')}`}
+                        sub="Captured court revenue via AI"
+                        badge="Direct Pay"
+                        onClick={() => openDrawer(
+                          'Confirmed Court Bookings',
+                          `${data.stats.visitsBooked} court bookings captured across Box Cricket and Football`,
+                          data.leads
+                        )}
+                      />
+
+                      <StatCard
+                        icon={Clock}
+                        label="Night Calls Saved"
+                        tone="accent"
+                        value={data.stats.conversations.toLocaleString('en-IN')}
+                        sub="Booked 8 PM – 2 AM with 0 staff"
+                        badge="100% Uptime"
+                        onClick={() => openDrawer(
+                          'Late Night Calls Handled',
+                          `${data.stats.conversations} inbound inquiries resolved outside of facility counter hours`,
+                          data.allLeads.filter(l => l.durationSecs > 10)
+                        )}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <StatCard
+                        icon={PhoneCall}
+                        label="Calls Dialed"
+                        tone="default"
+                        value={data.stats.totalCalls.toLocaleString('en-IN')}
+                        sub={`${data.stats.answeredCalls} connected (${data.stats.connectRate}%)`}
+                        badge="+12%"
+                        onClick={() => openDrawer(
+                          'All Dialed Calls',
+                          `All ${data.stats.totalCalls} outreach calls in selected period`,
+                          data.allLeads
+                        )}
+                      />
+
+                      <StatCard
+                        icon={Phone}
+                        label="Qualified Leads"
+                        tone="green"
+                        value={data.stats.qualifiedLeads.toLocaleString('en-IN')}
+                        sub={data.stats.answeredCalls > 0 ? `${data.stats.qualifiedRate}% of connected` : '0 of 0 connected'}
+                        badge={`${data.stats.qualifiedRate}% rate`}
+                        onClick={() => openDrawer(
+                          'Qualified Leads',
+                          `${data.stats.qualifiedLeads} high-intent buyers verified with budget, location & timeline`,
+                          data.leads
+                        )}
+                      />
+
+                      <StatCard
+                        icon={CalendarCheck}
+                        label="Site Visits Booked"
+                        tone="brass"
+                        value={data.stats.visitsBooked.toLocaleString('en-IN')}
+                        sub={data.stats.qualifiedLeads > 0 ? `${data.stats.visitsBooked} of ${data.stats.qualifiedLeads} qualified` : '0 visits scheduled'}
+                        badge={`${data.stats.visitBookedRate}% conv`}
+                        onClick={() => openDrawer(
+                          'Site Visits Booked',
+                          `${data.stats.visitsBooked} scheduled site inspections with date/time slots`,
+                          data.allLeads.filter(l => l.status === 'Booked' || l.siteVisitSlot !== '—')
+                        )}
+                      />
+
+                      <StatCard
+                        icon={Trophy}
+                        label="Conversations Held"
+                        tone="accent"
+                        value={data.stats.conversations.toLocaleString('en-IN')}
+                        sub={`Avg ${formatDuration(data.stats.avgDurationSecs)} duration`}
+                        badge="Engaged"
+                        onClick={() => openDrawer(
+                          'Conversations Held',
+                          `${data.stats.conversations} completed voice calls reaching discovery & intent verification`,
+                          data.allLeads.filter(l => l.durationSecs > 10)
+                        )}
+                      />
+                    </>
+                  )}
                 </>
               ) : null}
             </section>
@@ -714,12 +1054,28 @@ export default function ClientDashboard() {
               <section style={{ marginBottom: 20 }}>
                 <Card id="funnel-card">
                   <SectionHeading
-                    eyebrow="Conversion Flow Diagnostics"
-                    title="Where the Lead Funnel Converts & Leaks"
-                    description="End-to-end trace from first AI voice outreach to confirmed site visits."
+                    eyebrow={
+                      isCsTurf ? 'Outbound Cold Calling Funnel' :
+                      isSportzone ? '24/7 Inbound Court Booking Funnel' :
+                      'Conversion Flow Diagnostics'
+                    }
+                    title={
+                      isCsTurf ? 'Turf Owner Pitch & Demo Conversion' :
+                      isSportzone ? 'Inbound Caller to Instant Playo Link' :
+                      'Where the Lead Funnel Converts & Leaks'
+                    }
+                    description={
+                      isCsTurf ? 'Real-time diagnostic trace from cold dialing to booked 15-minute software demos.' :
+                      isSportzone ? 'Instant disambiguation of sport (Cricket vs Football), pricing, time slots, and WhatsApp link.' :
+                      'End-to-end trace from first AI voice outreach to confirmed site visits.'
+                    }
                     rightAction={data && (
                       <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: T.green, background: T.greenSoft, padding: '3px 8px', borderRadius: 10, fontWeight: 600 }}>
-                        {maxFunnelVal > 0 ? `${((data.stats.visitsBooked / maxFunnelVal) * 100).toFixed(1)}% Visit Rate` : '—'}
+                        {maxFunnelVal > 0 ? (
+                          isCsTurf ? `${((data.stats.visitsBooked / maxFunnelVal) * 100).toFixed(1)}% Demo Rate` :
+                          isSportzone ? `${((data.stats.visitsBooked / maxFunnelVal) * 100).toFixed(1)}% Link Rate` :
+                          `${((data.stats.visitsBooked / maxFunnelVal) * 100).toFixed(1)}% Visit Rate`
+                        ) : '—'}
                       </span>
                     )}
                   />
@@ -775,7 +1131,23 @@ export default function ClientDashboard() {
             {/* ── 5. Velocity & Root Cause Charts ── */}
             <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginBottom: 20 }}>
               <Card id="trend-chart">
-                <SectionHeading eyebrow="Performance Velocity" title="Conversations vs Visits" description="Weekly pace of AI outreach vs confirmed visit slots." />
+                <SectionHeading
+                  eyebrow={
+                    isCsTurf ? 'Outbound Velocity' :
+                    isSportzone ? 'Booking Velocity' :
+                    'Performance Velocity'
+                  }
+                  title={
+                    isCsTurf ? 'Calls vs Demos Booked' :
+                    isSportzone ? 'Inquiries vs Playo Links' :
+                    'Conversations vs Visits'
+                  }
+                  description={
+                    isCsTurf ? 'Weekly pace of cold outreach calls vs confirmed product demo slots.' :
+                    isSportzone ? 'Hourly & weekly pace of incoming inquiries vs automated Playo payment links.' :
+                    'Weekly pace of AI outreach vs confirmed visit slots.'
+                  }
+                />
                 {loading ? (
                   <div style={{ height: 180, background: T.surfaceLight, borderRadius: 10, marginTop: 8 }} />
                 ) : data && data.trend.length > 0 ? (
@@ -797,14 +1169,20 @@ export default function ClientDashboard() {
                           <XAxis dataKey="week" tick={{ fontSize: 10, fontFamily: 'var(--font-mono)', fill: T.textMuted }} axisLine={{ stroke: T.border }} tickLine={false} />
                           <YAxis tick={{ fontSize: 10, fontFamily: 'var(--font-mono)', fill: T.textMuted }} axisLine={{ stroke: T.border }} tickLine={false} />
                           <Tooltip contentStyle={{ background: T.surfaceElevated, borderColor: T.borderStrong, borderRadius: 10, fontSize: 11, color: T.textPrimary }} />
-                          <Area type="monotone" dataKey="conversations" name="Conversations" stroke={T.accentGlow} fill="url(#convGrad)" strokeWidth={2} />
-                          <Area type="monotone" dataKey="bookings" name="Visits Booked" stroke={T.brass} fill="url(#bookGrad)" strokeWidth={2} />
+                          <Area type="monotone" dataKey="conversations" name={isSportzone ? "Inquiries" : "Conversations"} stroke={T.accentGlow} fill="url(#convGrad)" strokeWidth={2} />
+                          <Area type="monotone" dataKey="bookings" name={isCsTurf ? "Demos Booked" : isSportzone ? "Playo Links" : "Visits Booked"} stroke={T.brass} fill="url(#bookGrad)" strokeWidth={2} />
                         </AreaChart>
                       </ResponsiveContainer>
                     </div>
                     <div style={{ display: 'flex', gap: 12, marginTop: 6, justifyContent: 'flex-end' }}>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: T.accentGlow, display: 'flex', alignItems: 'center', gap: 4 }}><span style={{ width: 6, height: 6, borderRadius: '50%', background: T.accentGlow }} /> Conversations</span>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: T.brass, display: 'flex', alignItems: 'center', gap: 4 }}><span style={{ width: 6, height: 6, borderRadius: '50%', background: T.brass }} /> Visits</span>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: T.accentGlow, display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: T.accentGlow }} />
+                        {isSportzone ? "Inquiries" : "Conversations"}
+                      </span>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: T.brass, display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: T.brass }} />
+                        {isCsTurf ? "Demos" : isSportzone ? "Playo Links" : "Visits"}
+                      </span>
                     </div>
                   </>
                 ) : (
@@ -815,7 +1193,23 @@ export default function ClientDashboard() {
               </Card>
 
               <Card id="drop-reasons-chart">
-                <SectionHeading eyebrow="Root Cause Analysis" title="Call Drop Breakdown" description="Where and why conversations end without a visit booking." />
+                <SectionHeading
+                  eyebrow={
+                    isCsTurf ? 'Objection Breakdown' :
+                    isSportzone ? 'Unbooked Inquiries' :
+                    'Root Cause Analysis'
+                  }
+                  title={
+                    isCsTurf ? 'Why Turf Owners Say No' :
+                    isSportzone ? "Why Callers Didn't Book" :
+                    'Call Drop Breakdown'
+                  }
+                  description={
+                    isCsTurf ? 'Primary gatekeeper and price resistance reasons logged during cold calls.' :
+                    isSportzone ? 'Primary reasons an inbound caller dropped without requesting a payment link.' :
+                    'Where and why conversations end without a visit booking.'
+                  }
+                />
                 {loading ? (
                   <div style={{ height: 180, background: T.surfaceLight, borderRadius: 10, marginTop: 8 }} />
                 ) : data && data.dropReasons.length > 0 ? (
@@ -841,12 +1235,24 @@ export default function ClientDashboard() {
             <section style={{ marginBottom: 20 }}>
               <Card id="leads-table">
                 <SectionHeading
-                  eyebrow="Live Buyer Pipeline"
-                  title="Recent Qualified Leads"
-                  description="Extracted from call transcripts. Tap any lead to inspect audio & transcript."
+                  eyebrow={
+                    isCsTurf ? 'B2B Turf Pipeline' :
+                    isSportzone ? 'Live Court Bookings' :
+                    'Live Buyer Pipeline'
+                  }
+                  title={
+                    isCsTurf ? 'Recent Turf Owner Leads' :
+                    isSportzone ? 'Recent Court Inquiries' :
+                    'Recent Qualified Leads'
+                  }
+                  description={
+                    isCsTurf ? 'Extracted turf manager intents & booking audit notes. Tap any lead to inspect audio & transcript.' :
+                    isSportzone ? 'Extracted player requests with sport, court slot, and instant WhatsApp link. Tap to inspect.' :
+                    'Extracted from call transcripts. Tap any lead to inspect audio & transcript.'
+                  }
                   rightAction={data && (
                     <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: T.textMuted }}>
-                      {data.leads.length} leads · Tap to inspect
+                      {data.leads.length} {isCsTurf ? 'turf leads' : isSportzone ? 'inquiries' : 'leads'} · Tap to inspect
                     </span>
                   )}
                 />
@@ -879,8 +1285,31 @@ export default function ClientDashboard() {
                               <span style={{ fontSize: 13, fontWeight: 700, color: T.textPrimary }}>{lead.name}</span>
                               <span style={{ fontSize: 10, color: sc.fg }}>●</span>
                             </div>
-                            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textMuted, marginTop: 2 }}>
-                              {lead.budget !== '—' ? lead.budget : ''} {lead.location !== '—' ? `· ${lead.location}` : ''} {lead.time ? `· ${lead.time}` : ''}
+                            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textMuted, marginTop: 2, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                              <span>{lead.budget !== '—' ? lead.budget : ''} {lead.location !== '—' ? `· ${lead.location}` : ''} {lead.time ? `· ${lead.time}` : ''}</span>
+                              {isSportzone && lead.phone && lead.phone !== '—' && (
+                                <a
+                                  href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}?text=Hi%20${encodeURIComponent(lead.name)},%20here%20is%20your%20Sportzone%20Arena%20booking%20link:`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  onClick={e => e.stopPropagation()}
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 3,
+                                    padding: '1px 6px',
+                                    borderRadius: 6,
+                                    background: 'rgba(79, 190, 135, 0.15)',
+                                    border: '1px solid rgba(79, 190, 135, 0.3)',
+                                    color: T.green,
+                                    fontSize: 10,
+                                    fontWeight: 600,
+                                    textDecoration: 'none',
+                                  }}
+                                >
+                                  💬 WhatsApp Link
+                                </a>
+                              )}
                             </div>
                           </div>
 
@@ -895,7 +1324,9 @@ export default function ClientDashboard() {
                     })
                   ) : !loading && (
                     <div style={{ padding: '30px 0', textAlign: 'center', color: T.textMuted, fontFamily: 'var(--font-mono)', fontSize: 12 }}>
-                      No qualified leads captured in this date range.
+                      {isCsTurf ? 'No turf leads captured in this date range.' :
+                       isSportzone ? 'No court inquiries captured in this date range.' :
+                       'No qualified leads captured in this date range.'}
                     </div>
                   )}
                 </div>
@@ -907,11 +1338,15 @@ export default function ClientDashboard() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <ShieldCheck size={16} color={T.green} style={{ flexShrink: 0 }} />
                 <span style={{ fontSize: 11.5, color: T.green, fontWeight: 600 }}>
-                  100% DND-Scrubbed · TRAI / DLT Registered · Call Consent Logged
+                  {isSportzone
+                    ? 'Instant WhatsApp Booking Link · 24/7 Voice Automated · Direct Playo Integration'
+                    : isCsTurf
+                    ? '100% DND-Scrubbed · B2B Outreach Registered · Call Consent Logged'
+                    : '100% DND-Scrubbed · TRAI / DLT Registered · Call Consent Logged'}
                 </span>
               </div>
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: T.green }}>
-                Indian Telecom Compliant
+                {isSportzone ? 'Arena Booking Automated' : 'Indian Telecom Compliant'}
               </span>
             </section>
           </div>
@@ -920,6 +1355,11 @@ export default function ClientDashboard() {
         {/* TAB 2: OUTBOUND CAMPAIGNS */}
         {activeTab === 'outbound' && (
           <OutboundCampaignsView />
+        )}
+
+        {/* TAB 3: TEST CALL STUDIO */}
+        {activeTab === 'test_call' && (
+          <TestCallStudioView userRole={profile?.role} selectedAgentId={selectedAgentId} />
         )}
       </main>
 

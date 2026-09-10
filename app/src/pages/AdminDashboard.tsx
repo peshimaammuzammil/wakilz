@@ -856,13 +856,13 @@ export default function AdminDashboard() {
         <div style={{ padding: '36px', textAlign: 'center', color: '#4E6080', fontSize: 13 }}>No users yet</div>
       ) : (
         <div>
-          <div className="adm-client-row" style={{ display: 'grid', gridTemplateColumns: '1fr 200px 100px 120px', padding: '10px 18px', background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-            {['User', 'Email', 'Role', 'Client ID'].map(h => (
+          <div className="adm-client-row" style={{ display: 'grid', gridTemplateColumns: '1fr 200px 100px 120px 120px', padding: '10px 18px', background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            {['User', 'Email', 'Role', 'Client ID', 'Actions'].map(h => (
               <div key={h} style={{ fontSize: '10px', fontWeight: 600, color: '#4E6080', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'IBM Plex Mono', monospace" }}>{h}</div>
             ))}
           </div>
           {clients.map((client, i) => (
-            <div key={client.id} className="adm-client-row" style={{ display: 'grid', gridTemplateColumns: '1fr 200px 100px 120px', padding: '13px 18px', alignItems: 'center', borderBottom: i < clients.length-1 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
+            <div key={client.id} className="adm-client-row" style={{ display: 'grid', gridTemplateColumns: '1fr 200px 100px 120px 120px', padding: '13px 18px', alignItems: 'center', borderBottom: i < clients.length-1 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
                 <div style={{ width: '30px', height: '30px', borderRadius: '50%', flexShrink: 0, background: client.role==='admin' ? 'linear-gradient(135deg,#2A3FE0,#7C8FFF)' : 'linear-gradient(135deg,#1F7A4D,#4FBE87)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, color: '#fff' }}>
                   {(client.displayName||client.email||'?')[0].toUpperCase()}
@@ -878,6 +878,27 @@ export default function AdminDashboard() {
                 </span>
               </div>
               <div className="adm-client-col-id" style={{ fontSize: '11px', color: '#4E6080', fontFamily: "'IBM Plex Mono', monospace" }}>{client.clientId||'—'}</div>
+              <div>
+                <button
+                  onClick={() => {
+                    // Navigate to dashboard with client ID context (requires route update)
+                    navigate('/dashboard?client=' + client.clientId)
+                  }}
+                  style={{
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    background: 'rgba(90,108,255,0.12)',
+                    color: '#7C8FFF',
+                    border: '1px solid rgba(90,108,255,0.25)',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    fontFamily: "'Inter', sans-serif"
+                  }}
+                >
+                  View Dash
+                </button>
+              </div>
             </div>
           ))}
         </div>
