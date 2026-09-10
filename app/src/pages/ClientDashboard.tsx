@@ -120,7 +120,9 @@ function StatCard({ icon: Icon, label, value, sub, tone = 'default', badge, onCl
         transition: 'transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
         cursor: onClick ? 'pointer' : 'default',
         position: 'relative',
-        minHeight: 116,
+        minHeight: 128,
+        height: '100%',
+        boxSizing: 'border-box',
       }}
       onMouseEnter={e => {
         e.currentTarget.style.borderColor = 'rgba(229, 192, 123, 0.5)'
@@ -134,7 +136,7 @@ function StatCard({ icon: Icon, label, value, sub, tone = 'default', badge, onCl
       }}
     >
       {/* Row 1: Icon on left, Badge cleanly on right */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, height: 32 }}>
         <div style={{ width: 32, height: 32, borderRadius: 10, background: bg, border: `1px solid ${iconBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: `0 2px 10px ${bg}` }}>
           <Icon size={16} color={fg} />
         </div>
@@ -157,15 +159,14 @@ function StatCard({ icon: Icon, label, value, sub, tone = 'default', badge, onCl
       </div>
 
       {/* Row 2: Value & Label */}
-      <div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <div style={{
           fontFamily: 'var(--font-display)',
-          fontSize: 'clamp(20px, 3.8vw, 28px)',
+          fontSize: 'clamp(22px, 3.4vw, 28px)',
           color: fg,
           fontWeight: 800,
           lineHeight: 1.1,
           letterSpacing: '-0.02em',
-          margin: '2px 0 2px',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -174,7 +175,7 @@ function StatCard({ icon: Icon, label, value, sub, tone = 'default', badge, onCl
         </div>
         <div style={{
           fontFamily: 'var(--font-body)',
-          fontSize: 'clamp(11px, 2.7vw, 13px)',
+          fontSize: 12.5,
           fontWeight: 600,
           color: T.textSecondary,
           lineHeight: 1.25,
@@ -192,7 +193,7 @@ function StatCard({ icon: Icon, label, value, sub, tone = 'default', badge, onCl
           fontFamily: 'var(--font-mono)',
           fontSize: 10.5,
           color: T.textMuted,
-          marginTop: 5,
+          marginTop: 4,
           lineHeight: 1.3,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -894,11 +895,11 @@ export default function ClientDashboard() {
 
                       <StatCard
                         icon={Phone}
-                        label="Pain Identified"
+                        label="Qualified Leads"
                         tone="green"
                         value={data.stats.qualifiedLeads.toLocaleString('en-IN')}
-                        sub={`${data.stats.qualifiedRate}% admitted lost calls`}
-                        badge="-20 calls"
+                        sub={data.stats.answeredCalls > 0 ? `${data.stats.qualifiedRate}% of connected` : '0 of 0 connected'}
+                        badge={`${data.stats.qualifiedRate}% rate`}
                         onClick={() => openDrawer(
                           'Turf Owners With Missed Calls',
                           `${data.stats.qualifiedLeads} turf owners who admitted losing peak evening revenue to unmanaged calls`,
@@ -908,11 +909,11 @@ export default function ClientDashboard() {
 
                       <StatCard
                         icon={CalendarCheck}
-                        label="Demos Booked"
+                        label="Site Visits Booked"
                         tone="brass"
                         value={data.stats.visitsBooked.toLocaleString('en-IN')}
-                        sub={`${data.stats.visitBookedRate}% demo conversion`}
-                        badge="High Intent"
+                        sub={data.stats.qualifiedLeads > 0 ? `${data.stats.visitsBooked} of ${data.stats.qualifiedLeads} qualified` : '0 visits scheduled'}
+                        badge={`${data.stats.visitBookedRate}% conv`}
                         onClick={() => openDrawer(
                           'Software Demos Booked',
                           `${data.stats.visitsBooked} confirmed product walk-through slots and demo requests`,
@@ -938,11 +939,11 @@ export default function ClientDashboard() {
                     <>
                       <StatCard
                         icon={PhoneCall}
-                        label="Inbound Calls"
+                        label="Calls Dialed"
                         tone="default"
                         value={data.stats.totalCalls.toLocaleString('en-IN')}
-                        sub={`${data.stats.answeredCalls} handled (0s hold)`}
-                        badge="24/7 Live"
+                        sub={`${data.stats.answeredCalls} connected (${data.stats.connectRate}%)`}
+                        badge="+18%"
                         onClick={() => openDrawer(
                           'All Inbound Inquiries',
                           `All ${data.stats.totalCalls} callers seeking court availability`,
@@ -951,12 +952,12 @@ export default function ClientDashboard() {
                       />
 
                       <StatCard
-                        icon={CalendarCheck}
-                        label="Playo Links"
+                        icon={Phone}
+                        label="Qualified Leads"
                         tone="green"
-                        value={data.stats.visitsBooked.toLocaleString('en-IN')}
-                        sub={`${data.stats.visitBookedRate}% link delivery rate`}
-                        badge="Automated"
+                        value={data.stats.qualifiedLeads.toLocaleString('en-IN')}
+                        sub={data.stats.answeredCalls > 0 ? `${data.stats.qualifiedRate}% of connected` : '0 of 0 connected'}
+                        badge={`${data.stats.qualifiedRate}% rate`}
                         onClick={() => openDrawer(
                           'Playo Links Delivered',
                           `${data.stats.visitsBooked} direct payment and slot hold links dispatched via WhatsApp`,
@@ -965,12 +966,12 @@ export default function ClientDashboard() {
                       />
 
                       <StatCard
-                        icon={Trophy}
-                        label="Booking Value"
+                        icon={CalendarCheck}
+                        label="Site Visits Booked"
                         tone="brass"
-                        value={`₹${(data.stats.visitsBooked * 1500).toLocaleString('en-IN')}`}
-                        sub="Captured court revenue via AI"
-                        badge="Direct Pay"
+                        value={data.stats.visitsBooked.toLocaleString('en-IN')}
+                        sub={data.stats.qualifiedLeads > 0 ? `${data.stats.visitsBooked} of ${data.stats.qualifiedLeads} qualified` : '0 visits scheduled'}
+                        badge={`${data.stats.visitBookedRate}% conv`}
                         onClick={() => openDrawer(
                           'Confirmed Court Bookings',
                           `${data.stats.visitsBooked} court bookings captured across Box Cricket and Football`,
@@ -979,12 +980,12 @@ export default function ClientDashboard() {
                       />
 
                       <StatCard
-                        icon={Clock}
-                        label="Night Calls"
+                        icon={Trophy}
+                        label="Conversations Held"
                         tone="accent"
                         value={data.stats.conversations.toLocaleString('en-IN')}
-                        sub="Booked 8 PM – 2 AM with 0 staff"
-                        badge="100% Uptime"
+                        sub={`Avg ${formatDuration(data.stats.avgDurationSecs)} duration`}
+                        badge="Engaged"
                         onClick={() => openDrawer(
                           'Late Night Calls Handled',
                           `${data.stats.conversations} inbound inquiries resolved outside of facility counter hours`,
