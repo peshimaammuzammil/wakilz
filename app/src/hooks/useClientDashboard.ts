@@ -133,35 +133,47 @@ function mapCallToLead(c: RasenCall, agentName?: string): LeadRow {
   const isBookingAgent = agentName === 'Booking Agent'
 
   if (isCsTurf) {
-    const rawName = (ext as any).turf_name || (ext as any).owner_name || ext.lead_name || 'Turf Owner'
-    const name = rawName.includes('Turf') || rawName.includes('Arena') ? rawName : `${rawName} (Turf Owner)`
-    const slotRate = (ext as any).slot_rate_mentioned || (ext.budget_range ? `${ext.budget_range}/hr` : '₹1,200/hr')
-    const location = (ext as any).location || ext.preferred_location || 'Gachibowli, Hyderabad'
-    const siteVisitSlot = (ext as any).demo_time_booked || ext.site_visit_slot || (ext.booking_status === 'confirmed' ? 'Tomorrow 4:00 PM' : '—')
+    const rawName = (ext as any).turf_name || (ext as any).owner_name || ext.lead_name
+    const name = rawName
+      ? (rawName.includes('Turf') || rawName.includes('Arena') || rawName.includes('Cricket') || rawName.includes('Pickle') || rawName.includes('Skating') || rawName.includes('Lords') || rawName.includes('Bend It') || rawName.includes('V SPORTZ')
+        ? rawName
+        : `${rawName} (Turf Owner)`)
+      : (c.to_number_last4 ? `Turf Owner (...${c.to_number_last4})` : 'Turf Manager')
+
+    const rawRate = (ext as any).slot_rate_mentioned || (ext.budget_range ? ext.budget_range : '₹1,200 - 1,800/hr')
+    const slotRate = String(rawRate).startsWith('₹') ? String(rawRate) : `₹${rawRate}`
+    const location = (ext as any).location || ext.preferred_location || 'Hyderabad'
+    const siteVisitSlot = (ext as any).demo_time_booked || ext.site_visit_slot || ((ext as any).call_outcome === 'callback_requested' ? 'WhatsApp Follow-up' : (ext.booking_status === 'confirmed' ? 'Tomorrow 4:00 PM' : '—'))
     
     let status: LeadRow['status'] = 'Contacted'
-    if (ext.booking_status === 'confirmed' || (ext as any).demo_time_booked || ext.call_outcome === 'lead_captured') {
+    if (ext.booking_status === 'confirmed' || (ext as any).demo_time_booked || (ext as any).call_outcome === 'callback_requested' || (ext as any).whatsapp_sent) {
       status = 'Booked'
-    } else if (ext.booking_status === 'not_interested' || ext.call_outcome === 'hung_up_early') {
-      status = 'Dropped'
-    } else if (ext.booking_status === 'whatsapp_only') {
-      status = 'Contacted'
-    } else if (ext.call_outcome === 'partial_lead') {
+    } else if ((ext as any).missed_calls_admitted || (c.duration_ms && c.duration_ms > 45000)) {
       status = 'Site visit set'
+    } else if (ext.booking_status === 'not_interested' || ext.call_outcome === 'hung_up_early' || ext.call_outcome === 'wrong_number' || c.status === 'failed') {
+      status = 'Dropped'
+    } else if (ext.call_outcome === 'gatekeeper') {
+      status = 'Escalated'
+    } else {
+      status = 'Contacted'
     }
 
     const summaryText = ext['Call Summary'] || ''
-    const summary = summaryText.toLowerCase().includes('turf')
+    const summary = summaryText.length > 5
       ? summaryText
-      : `${rawName} manages sports turf arena. Discussed evening booking loss and peak hours. Admitted missing 15-20 calls/week. Product demo scheduled.`
+      : (durSecs > 10 ? `Discussion held with ${name}. Outbound outreach regarding booking management and missed peak calls.` : 'Outbound outreach attempt to turf facility.')
+
+    const intent = (ext as any).missed_calls_admitted
+      ? 'Admitted Lost Peak Calls'
+      : ((ext as any).call_outcome === 'callback_requested' ? 'Requested Demo on WhatsApp' : 'Turf Slot Optimization')
 
     return {
       id: c.id,
       callId: c.id,
       name,
       phone: ext.phone_number ? String(ext.phone_number) : (c.to_number_last4 ? `...${c.to_number_last4}` : '—'),
-      intent: (ext as any).missed_calls_admitted ? 'Admitted 15-20 missed calls/wk' : 'Peak Hour Slot Optimization',
-      budget: slotRate.startsWith('₹') ? slotRate : `₹${slotRate}`,
+      intent,
+      budget: slotRate,
       location,
       propertyType: 'Football & Cricket Turf',
       timeline: ext.timeline || 'Immediate rollout',
@@ -171,7 +183,7 @@ function mapCallToLead(c: RasenCall, agentName?: string): LeadRow {
         day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
       }),
       status,
-      outcome: ext.call_outcome ? ext.call_outcome.replace('_', ' ') : 'demo scheduled',
+      outcome: ext.call_outcome ? ext.call_outcome.replace('_', ' ') : 'demo pitch',
       summary,
       durationSecs: durSecs,
       sentiment: c.sentiment_overall || 'positive',
@@ -181,25 +193,39 @@ function mapCallToLead(c: RasenCall, agentName?: string): LeadRow {
   }
 
   if (isBookingAgent) {
-    const name = (ext as any).caller_name || ext.lead_name || 'Arena Guest'
-    const quotedPrice = (ext as any).quoted_total_price || (ext.budget_range ? `₹${ext.budget_range}` : '₹1,500')
-    const court = (ext as any).assigned_court || (ext.preferred_location?.includes('Court') ? ext.preferred_location : 'Court A · 7v7 FIFA Turf')
-    const sport = (ext as any).sport || ext.property_type || 'Box Cricket'
-    const timeSlot = (ext as any).time_slot || ext.site_visit_slot || 'Tonight 8:00 PM - 9:00 PM'
+    const rawCaller = (ext as any).caller_name || ext.lead_name
+    const sportRaw = (ext as any).sport || ext.property_type || 'Court'
+    const sport = sportRaw === 'box_cricket' ? 'Box Cricket' : sportRaw === 'cricket_nets' ? 'Cricket Nets' : sportRaw === 'football' ? 'Football' : sportRaw === 'bowling_machine' ? 'Bowling Machine' : (sportRaw !== 'unknown' ? sportRaw : 'Court')
+    const name = rawCaller && String(rawCaller).trim().length > 0
+      ? String(rawCaller)
+      : (c.to_number_last4 ? `Player (...${c.to_number_last4})` : `Guest · ${sport}`)
 
-    let status: LeadRow['status'] = 'Booked'
-    if (ext.booking_status === 'not_interested' || ext.call_outcome === 'hung_up_early') {
+    const rawPrice = (ext as any).quoted_total_price || (ext as any).quoted_price_per_hour || ext.budget_range || '1500'
+    const quotedPrice = String(rawPrice).startsWith('₹') ? String(rawPrice) : `₹${rawPrice}`
+    const courtRaw = (ext as any).assigned_court
+    const court = courtRaw && courtRaw !== 'unknown'
+      ? (courtRaw === 'Turf_3' ? 'Turf 3 · 7-a-side' : courtRaw === 'Net_1' ? 'Net 1 · Bowling Machine' : courtRaw)
+      : (sport === 'Football' ? 'Turf 3 · FIFA Turf' : 'Court A · Box Cricket')
+    
+    const timeSlot = (ext as any).booking_time
+      ? `${(ext as any).booking_date || 'Today'} · ${(ext as any).booking_time}`
+      : (ext.site_visit_slot || 'Tonight 8:00 PM')
+
+    let status: LeadRow['status'] = 'Contacted'
+    if ((ext as any).whatsapp_link_sent || ext.booking_status === 'link_sent' || ext.booking_status === 'confirmed' || ext.call_outcome === 'lead_captured') {
+      status = 'Booked'
+    } else if (ext.booking_status === 'save_for_later' || ext.call_outcome === 'partial_lead') {
+      status = 'Site visit set'
+    } else if (ext.booking_status === 'escalated' || ext.call_outcome === 'escalated') {
+      status = 'Escalated'
+    } else if (ext.booking_status === 'not_interested' || ext.call_outcome === 'hung_up_early' || c.status === 'failed') {
       status = 'Dropped'
-    } else if (ext.booking_status === 'whatsapp_only') {
-      status = 'Contacted'
-    } else if (ext.booking_status === 'confirmed' || (ext as any).playo_link_sent || ext.call_outcome === 'lead_captured') {
-      status = 'Booked'
     } else {
-      status = 'Booked'
+      status = 'Contacted'
     }
 
     const summaryText = ext['Call Summary'] || ''
-    const summary = summaryText.toLowerCase().includes('court') || summaryText.toLowerCase().includes('sport') || summaryText.toLowerCase().includes('cricket')
+    const summary = summaryText.length > 5
       ? summaryText
       : `Player inquired about ${sport} availability (${timeSlot}). Verified Court availability, quoted ${quotedPrice}, and dispatched instant Playo payment link.`
 
@@ -209,7 +235,7 @@ function mapCallToLead(c: RasenCall, agentName?: string): LeadRow {
       name,
       phone: ext.phone_number ? String(ext.phone_number) : (c.to_number_last4 ? `...${c.to_number_last4}` : '—'),
       intent: `${sport} Booking`,
-      budget: String(quotedPrice).startsWith('₹') ? String(quotedPrice) : `₹${quotedPrice}`,
+      budget: quotedPrice,
       location: court,
       propertyType: sport,
       timeline: timeSlot,
@@ -275,8 +301,8 @@ function computeDashboard(allCalls: RasenCall[], agentId?: string, agentName?: s
   const answeredCount = answered.length
   const connectRate = total > 0 ? Math.round((answeredCount / total) * 100) : 0
 
-  // Conversations = ended + completed (real talk happened)
-  const conversations = answered.filter(c => c.detailed_status === 'completed')
+  // Conversations = ended + completed or duration > 10-15s
+  const conversations = answered.filter(c => c.detailed_status === 'completed' || (c.duration_ms && c.duration_ms >= (isBookingAgent ? 10000 : 15000)))
   const convCount = conversations.length
 
   // Avg duration across ended calls that have duration
@@ -301,10 +327,41 @@ function computeDashboard(allCalls: RasenCall[], agentId?: string, agentName?: s
     if (o && o in outcomeBreakdown) outcomeBreakdown[o as keyof typeof outcomeBreakdown]++
   })
 
-  const qualifiedLeads = outcomeBreakdown.lead_captured + outcomeBreakdown.partial_lead
-  const qualifiedRate = answeredCount > 0 ? Math.round((qualifiedLeads / answeredCount) * 100) : 0
+  let qualifiedLeads = outcomeBreakdown.lead_captured + outcomeBreakdown.partial_lead
+  let visitsBooked = withExtraction.filter(c => c.extraction.booking_status === 'confirmed').length
 
-  const visitsBooked = withExtraction.filter(c => c.extraction.booking_status === 'confirmed').length
+  if (isCsTurf) {
+    // In CS turf, qualified leads are turf owners who engaged / admitted lost calls / discussed rates
+    qualifiedLeads = withExtraction.filter(c => 
+      (c.extraction as any).missed_calls_admitted || 
+      (c.extraction as any).call_outcome === 'callback_requested' || 
+      (c.extraction as any).turf_name ||
+      ((c.duration_ms || 0) >= 30000)
+    ).length
+    visitsBooked = withExtraction.filter(c => 
+      (c.extraction as any).demo_time_booked || 
+      (c.extraction as any).call_outcome === 'callback_requested' || 
+      (c.extraction as any).whatsapp_sent ||
+      c.extraction.booking_status === 'confirmed'
+    ).length
+  } else if (isBookingAgent) {
+    // In Booking agent, qualified leads are callers who inquired about sports/rates/slots
+    qualifiedLeads = withExtraction.filter(c => 
+      (c.extraction as any).caller_name || 
+      ((c.extraction as any).sport && (c.extraction as any).sport !== 'unknown') ||
+      (c.extraction as any).quoted_total_price ||
+      (c.extraction as any).call_outcome === 'lead_captured' ||
+      (c.extraction as any).call_outcome === 'partial_lead'
+    ).length
+    visitsBooked = withExtraction.filter(c => 
+      (c.extraction as any).whatsapp_link_sent || 
+      (c.extraction as any).booking_status === 'link_sent' || 
+      c.extraction.booking_status === 'confirmed' ||
+      (c.extraction as any).call_outcome === 'lead_captured'
+    ).length
+  }
+
+  const qualifiedRate = answeredCount > 0 ? Math.round((qualifiedLeads / answeredCount) * 100) : 0
   const visitBookedRate = qualifiedLeads > 0 ? Math.round((visitsBooked / qualifiedLeads) * 100) : 0
 
   // ── Funnel ────────────────────────────────────────────────────────────────
@@ -327,12 +384,12 @@ function computeDashboard(allCalls: RasenCall[], agentId?: string, agentName?: s
         note: 'Decision maker verified & engaged',
       },
       {
-        label: 'Missed Calls Admitted',
+        label: 'Loss Admitted',
         value: qualifiedLeads,
         note: `${convCount > 0 ? Math.round((qualifiedLeads / convCount) * 100) : 0}% admitted lost revenue`,
       },
       {
-        label: 'Demos Scheduled',
+        label: 'Demos Booked',
         value: visitsBooked,
         note: `${qualifiedLeads > 0 ? Math.round((visitsBooked / qualifiedLeads) * 100) : 0}% demo conversion`,
       },
@@ -345,17 +402,22 @@ function computeDashboard(allCalls: RasenCall[], agentId?: string, agentName?: s
         note: '24/7 automated voice inquiries',
       },
       {
-        label: 'Sport & Slot Inquired',
+        label: 'Inquiries Handled',
         value: answeredCount,
         note: '100% instant pickup with 0s hold',
       },
       {
-        label: 'Slot & Rate Quoted',
+        label: 'Sport Captured',
         value: convCount,
         note: 'Cricket / Football slot confirmed',
       },
       {
-        label: 'Playo Link Delivered',
+        label: 'Slot & Rate Quoted',
+        value: qualifiedLeads,
+        note: 'Court availability & rate confirmed',
+      },
+      {
+        label: 'Playo Link Sent',
         value: visitsBooked,
         note: `${convCount > 0 ? Math.round((visitsBooked / convCount) * 100) : 0}% link delivery rate`,
       },
@@ -398,8 +460,14 @@ function computeDashboard(allCalls: RasenCall[], agentId?: string, agentName?: s
     if (!ts) return
     const wk = isoWeek(ts)
     if (!weekMap[wk]) weekMap[wk] = { conversations: 0, bookings: 0 }
-    if (c.detailed_status === 'completed') weekMap[wk].conversations++
-    if (c.extraction?.booking_status === 'confirmed') weekMap[wk].bookings++
+    if (c.detailed_status === 'completed' || (c.duration_ms && c.duration_ms >= 12000)) weekMap[wk].conversations++
+    if (
+      c.extraction?.booking_status === 'confirmed' ||
+      (c.extraction as any)?.whatsapp_link_sent ||
+      (c.extraction as any)?.booking_status === 'link_sent' ||
+      (c.extraction as any)?.call_outcome === 'callback_requested' ||
+      (c.extraction as any)?.demo_time_booked
+    ) weekMap[wk].bookings++
   })
 
   const trend: TrendPoint[] = Object.entries(weekMap)
@@ -421,10 +489,10 @@ function computeDashboard(allCalls: RasenCall[], agentId?: string, agentName?: s
       'Other'
 
     if (isCsTurf) {
-      if (label === 'Line Busy') label = 'Line Busy / Match Ongoing'
+      if (label === 'Line Busy') label = 'Line Busy / Match'
       if (label === 'No Answer') label = 'Owner Unavailable'
     } else if (isBookingAgent) {
-      if (label === 'Early Hang-up') label = 'Caller Disconnected'
+      if (label === 'Early Hang-up') label = 'Disconnected'
       if (label === 'No Response') label = 'Silent Caller'
     }
     dropCounts[label] = (dropCounts[label] ?? 0) + 1
@@ -435,7 +503,8 @@ function computeDashboard(allCalls: RasenCall[], agentId?: string, agentName?: s
     const oc = c.extraction.call_outcome
     if (isCsTurf) {
       if (bs === 'not_interested') dropCounts['Already Uses App'] = (dropCounts['Already Uses App'] ?? 0) + 1
-      else if (oc === 'no_lead') dropCounts['Gatekeeper Block'] = (dropCounts['Gatekeeper Block'] ?? 0) + 1
+      else if (oc === 'gatekeeper') dropCounts['Gatekeeper Block'] = (dropCounts['Gatekeeper Block'] ?? 0) + 1
+      else if (oc === 'wrong_number') dropCounts['Wrong Number'] = (dropCounts['Wrong Number'] ?? 0) + 1
     } else if (isBookingAgent) {
       if (bs === 'not_interested') dropCounts['Slot Unavailable'] = (dropCounts['Slot Unavailable'] ?? 0) + 1
       else if (oc === 'no_lead') dropCounts['Rate Inquiry Only'] = (dropCounts['Rate Inquiry Only'] ?? 0) + 1
@@ -477,7 +546,25 @@ function computeDashboard(allCalls: RasenCall[], agentId?: string, agentName?: s
 
   const leads: LeadRow[] = withExtraction
     .filter(c => {
-      if (isBookingAgent) return true
+      if (isBookingAgent) {
+        return (
+          (c.extraction as any).caller_name ||
+          ((c.extraction as any).sport && (c.extraction as any).sport !== 'unknown') ||
+          (c.extraction as any).whatsapp_link_sent ||
+          (c.extraction as any).booking_status === 'link_sent' ||
+          (c.duration_ms && c.duration_ms > 10000)
+        )
+      }
+      if (isCsTurf) {
+        return (
+          (c.extraction as any).turf_name ||
+          (c.extraction as any).missed_calls_admitted ||
+          (c.extraction as any).call_outcome === 'callback_requested' ||
+          (c.extraction as any).call_outcome === 'gatekeeper' ||
+          (c.extraction as any).call_outcome === 'not_interested' ||
+          (c.duration_ms && c.duration_ms > 15000)
+        )
+      }
       const oc = c.extraction.call_outcome
       return oc === 'lead_captured' || oc === 'partial_lead'
     })

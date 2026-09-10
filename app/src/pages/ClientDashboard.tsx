@@ -160,21 +160,27 @@ function StatCard({ icon: Icon, label, value, sub, tone = 'default', badge, onCl
       <div>
         <div style={{
           fontFamily: 'var(--font-display)',
-          fontSize: 'clamp(22px, 3.2vw, 30px)',
+          fontSize: 'clamp(20px, 3.8vw, 28px)',
           color: fg,
           fontWeight: 800,
           lineHeight: 1.1,
           letterSpacing: '-0.02em',
           margin: '2px 0 2px',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
         }}>
           {value}
         </div>
         <div style={{
           fontFamily: 'var(--font-body)',
-          fontSize: 12.5,
+          fontSize: 'clamp(11px, 2.7vw, 13px)',
           fontWeight: 600,
           color: T.textSecondary,
           lineHeight: 1.25,
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
         }}>
           {label}
         </div>
@@ -878,7 +884,7 @@ export default function ClientDashboard() {
                         tone="default"
                         value={data.stats.totalCalls.toLocaleString('en-IN')}
                         sub={`${data.stats.answeredCalls} connected (${data.stats.connectRate}%)`}
-                        badge="+15% wk"
+                        badge="+15%"
                         onClick={() => openDrawer(
                           'All Outbound Calls',
                           `All ${data.stats.totalCalls} turf owner outreach calls in selected period`,
@@ -888,11 +894,11 @@ export default function ClientDashboard() {
 
                       <StatCard
                         icon={Phone}
-                        label="Pain Point Identified"
+                        label="Pain Identified"
                         tone="green"
                         value={data.stats.qualifiedLeads.toLocaleString('en-IN')}
                         sub={`${data.stats.qualifiedRate}% admitted lost calls`}
-                        badge="-15 to 25 calls"
+                        badge="-20 calls"
                         onClick={() => openDrawer(
                           'Turf Owners With Missed Calls',
                           `${data.stats.qualifiedLeads} turf owners who admitted losing peak evening revenue to unmanaged calls`,
@@ -902,14 +908,14 @@ export default function ClientDashboard() {
 
                       <StatCard
                         icon={CalendarCheck}
-                        label="Software Demos Booked"
+                        label="Demos Booked"
                         tone="brass"
                         value={data.stats.visitsBooked.toLocaleString('en-IN')}
                         sub={`${data.stats.visitBookedRate}% demo conversion`}
                         badge="High Intent"
                         onClick={() => openDrawer(
                           'Software Demos Booked',
-                          `${data.stats.visitsBooked} confirmed 15-minute product walk-through slots`,
+                          `${data.stats.visitsBooked} confirmed product walk-through slots and demo requests`,
                           data.allLeads.filter(l => l.status === 'Booked' || l.siteVisitSlot !== '—')
                         )}
                       />
@@ -932,10 +938,10 @@ export default function ClientDashboard() {
                     <>
                       <StatCard
                         icon={PhoneCall}
-                        label="Inbound Inquiries"
+                        label="Inbound Calls"
                         tone="default"
                         value={data.stats.totalCalls.toLocaleString('en-IN')}
-                        sub={`${data.stats.answeredCalls} handled with 0s hold`}
+                        sub={`${data.stats.answeredCalls} handled (0s hold)`}
                         badge="24/7 Live"
                         onClick={() => openDrawer(
                           'All Inbound Inquiries',
@@ -946,7 +952,7 @@ export default function ClientDashboard() {
 
                       <StatCard
                         icon={CalendarCheck}
-                        label="Playo Links Sent"
+                        label="Playo Links"
                         tone="green"
                         value={data.stats.visitsBooked.toLocaleString('en-IN')}
                         sub={`${data.stats.visitBookedRate}% link delivery rate`}
@@ -960,7 +966,7 @@ export default function ClientDashboard() {
 
                       <StatCard
                         icon={Trophy}
-                        label="Gross Booking Value"
+                        label="Booking Value"
                         tone="brass"
                         value={`₹${(data.stats.visitsBooked * 1500).toLocaleString('en-IN')}`}
                         sub="Captured court revenue via AI"
@@ -974,7 +980,7 @@ export default function ClientDashboard() {
 
                       <StatCard
                         icon={Clock}
-                        label="Night Calls Saved"
+                        label="Night Calls"
                         tone="accent"
                         value={data.stats.conversations.toLocaleString('en-IN')}
                         sub="Booked 8 PM – 2 AM with 0 staff"
@@ -1280,9 +1286,9 @@ export default function ClientDashboard() {
                             transition: 'border-color 0.15s',
                           }}
                         >
-                          <div style={{ minWidth: 0 }}>
+                          <div style={{ minWidth: 0, flex: 1, marginRight: 8 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                              <span style={{ fontSize: 13, fontWeight: 700, color: T.textPrimary }}>{lead.name}</span>
+                              <span style={{ fontSize: 13, fontWeight: 700, color: T.textPrimary, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{lead.name}</span>
                               <span style={{ fontSize: 10, color: sc.fg }}>●</span>
                             </div>
                             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: T.textMuted, marginTop: 2, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
@@ -1310,11 +1316,27 @@ export default function ClientDashboard() {
                                   💬 WhatsApp Link
                                 </a>
                               )}
+                              {isCsTurf && (lead.intent.includes('WhatsApp') || lead.status === 'Booked') && (
+                                <span style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: 3,
+                                  padding: '1px 6px',
+                                  borderRadius: 6,
+                                  background: 'rgba(229, 192, 123, 0.15)',
+                                  border: '1px solid rgba(229, 192, 123, 0.3)',
+                                  color: T.brass,
+                                  fontSize: 10,
+                                  fontWeight: 600,
+                                }}>
+                                  📅 Demo Lead
+                                </span>
+                              )}
                             </div>
                           </div>
 
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 600, padding: '3px 8px', borderRadius: 8, background: sc.bg, color: sc.fg, border: `1px solid ${sc.border}` }}>
+                            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 600, padding: '3px 8px', borderRadius: 8, background: sc.bg, color: sc.fg, border: `1px solid ${sc.border}`, whiteSpace: 'nowrap' }}>
                               {lead.status}
                             </span>
                             <span style={{ color: T.brass, fontSize: 12 }}>→</span>
