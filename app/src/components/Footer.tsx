@@ -58,6 +58,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link to="/top-ai-voice-agents-real-estate" className="text-sm text-slate-400 hover:text-white transition-colors">
+                  Top AI Voice Agents (2026)
+                </Link>
+              </li>
+              <li>
                 <Link to="/ai-voice-agent-luxury-real-estate" className="text-sm text-slate-400 hover:text-white transition-colors">
                   Luxury Real Estate AI
                 </Link>

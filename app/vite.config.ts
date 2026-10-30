@@ -12,8 +12,15 @@ export default defineConfig({
     react(),
     Sitemap({ 
       hostname: 'https://wakilz.com/',
-      exclude: ['/404', '404'],
-      dynamicRoutes: ['/conversations', '/ai-isa-real-estate', '/multilingual-voice-agent', '/wakilz-vs-human-isa', '/ai-voice-agent-luxury-real-estate'],
+      exclude: ['/404', '404', '/mobile-design-preview', '/signin', '/admin', '/portal'],
+      dynamicRoutes: [
+        '/conversations',
+        '/ai-isa-real-estate',
+        '/multilingual-voice-agent',
+        '/wakilz-vs-human-isa',
+        '/top-ai-voice-agents-real-estate',
+        '/ai-voice-agent-luxury-real-estate'
+      ],
       generateRobotsTxt: false,
     })
   ],

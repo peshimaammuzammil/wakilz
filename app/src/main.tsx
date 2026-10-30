@@ -11,6 +11,7 @@ const ConversationsPage = lazy(() => import('./pages/ConversationsPage.tsx'))
 const AiIsaPage = lazy(() => import('./pages/AiIsaPage.tsx'))
 const MultilingualVoicePage = lazy(() => import('./pages/MultilingualVoicePage.tsx'))
 const WakilzVsIsaPage = lazy(() => import('./pages/WakilzVsIsaPage.tsx'))
+const TopAiVoiceAgentsPage = lazy(() => import('./pages/TopAiVoiceAgentsPage.tsx'))
 const LuxuryRealEstatePage = lazy(() => import('./pages/LuxuryRealEstatePage.tsx'))
 const SignInPage = lazy(() => import('./pages/SignInPage.tsx'))
 const PortalRedirect = lazy(() => import('./pages/PortalRedirect.tsx'))
@@ -40,6 +41,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/ai-isa-real-estate" element={<AiIsaPage />} />
           <Route path="/multilingual-voice-agent" element={<MultilingualVoicePage />} />
           <Route path="/wakilz-vs-human-isa" element={<WakilzVsIsaPage />} />
+          <Route path="/top-ai-voice-agents-real-estate" element={<TopAiVoiceAgentsPage />} />
           <Route path="/ai-voice-agent-luxury-real-estate" element={<LuxuryRealEstatePage />} />
           <Route path="/signin" element={<SignInPage />} />
 
