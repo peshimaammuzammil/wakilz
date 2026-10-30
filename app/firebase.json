@@ -20,6 +20,13 @@
         }
       },
       {
+        "source": "/webhooks/**",
+        "run": {
+          "serviceId": "wakilz-voice",
+          "region": "asia-south1"
+        }
+      },
+      {
         "source": "/health",
         "run": {
           "serviceId": "wakilz-voice",
