@@ -123,8 +123,8 @@ export default function TestCallStudioView({
 }) {
   const isAdmin = userRole === 'admin'
 
-  // Mode: phone (admin only) | webrtc (all)
-  const [mode, setMode] = useState<'phone' | 'webrtc'>(isAdmin ? 'phone' : 'webrtc')
+  // Mode: phone (active) | webrtc (disabled/archived)
+  const [mode, setMode] = useState<'phone' | 'webrtc'>('phone')
 
   // Config — loaded once
   const [agents, setAgents] = useState<RasenAgent[]>([])
@@ -384,8 +384,8 @@ export default function TestCallStudioView({
       {/* ── Mode Switcher ── */}
       <div style={{ display: 'flex', background: T.deep, border: `1px solid ${T.borderStrong}`, borderRadius: 11, padding: 3, gap: 3 }}>
         {[
-          { id: 'phone',  icon: Phone,     label: isAdmin ? 'Phone Call (Admin)' : 'Phone Call 🔒', locked: !isAdmin },
-          { id: 'webrtc', icon: Headphones, label: 'Browser WebRTC',  locked: false },
+          { id: 'phone',  icon: Phone,     label: 'Direct Phone Call', locked: false },
+          { id: 'webrtc', icon: Headphones, label: 'Browser WebRTC (Disabled)', locked: true },
         ].map(({ id, icon: Icon, label, locked }) => (
           <button key={id} onClick={() => !locked && setMode(id as 'phone' | 'webrtc')} style={{
             flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,

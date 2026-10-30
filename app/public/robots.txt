@@ -2,4 +2,20 @@ User-agent: *
 Allow: /
 Disallow: /404
 
+# AI Search & Answer Engine Crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
 Sitemap: https://wakilz.com/sitemap.xml

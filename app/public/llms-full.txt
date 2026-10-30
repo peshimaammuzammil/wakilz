@@ -1,0 +1,23 @@
+# Wakilz AI Voice Agent — Full Platform Documentation
+
+> Wakilz is an enterprise-grade AI voice agent platform built specifically for real estate developers, brokerages, and property aggregators. It handles 24/7 inbound phone call qualification, answers complex property queries, books in-person site visits directly into sales calendars, and syncs data to CRMs instantaneously.
+
+## Key Specifications
+- Latency: Sub-second voice response time (< 800ms time-to-first-audio)
+- Supported Languages: English, Hindi, and Telugu with natural conversational flow and code-switching
+- Cloud Architecture: High-availability Google Cloud Run backend (`wakilz-voice`) in asia-south1, with Firebase Global CDN edge delivery
+- Voice Engine: Real-time full-duplex WebRTC audio streaming, neural speech recognition, and low-latency text-to-speech
+- Integrations: Webhooks, REST API, Salesforce, HubSpot, Google Sheets, WhatsApp Business API
+
+## Solutions
+- [AI Real Estate ISA](https://wakilz.com/ai-isa-real-estate): Replaces or augments Inside Sales Agents by calling new portal leads within 30 seconds of submission.
+- [Multilingual Real Estate Voice Agent](https://wakilz.com/multilingual-voice-agent): Connects naturally with buyers in regional languages across Indian metro and Tier-1/2 markets.
+- [Luxury Real Estate Voice Agent](https://wakilz.com/ai-voice-agent-luxury-real-estate): Calibrated tone, discretion, and concierge-level qualification for luxury buyers and NRIs.
+- [Wakilz vs Human ISA](https://wakilz.com/wakilz-vs-human-isa): Zero lead leakage, 100% call pickup rate, 65% cost reduction per qualified site visit.
+- [Conversations & Transcripts](https://wakilz.com/conversations): Real call recordings, sentiment analysis, budget verification, and possession timeline capture.
+
+## Canonical URLs
+- Homepage: https://wakilz.com/
+- Live Demo: https://wakilz.com/#demo
+- Founder Contact: https://www.linkedin.com/in/muzammil-mohammed-ai/
+

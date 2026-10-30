@@ -1,17 +1,12 @@
 import { useState } from 'react'
-import { ArrowRight, PhoneOff } from 'lucide-react'
-import type { VoiceState } from '../hooks/useVoiceAgent'
+import { ArrowRight, PhoneCall } from 'lucide-react'
+import InboundCallModal from '../components/InboundCallModal'
 
 const languages = ['English', 'Telugu', 'Hindi'] as const
 
-interface HeroSectionProps {
-  voiceState: VoiceState
-  onConnect: () => Promise<void>
-  onDisconnect: () => void
-}
-
-export default function HeroSection({ voiceState, onConnect, onDisconnect }: HeroSectionProps) {
+export default function HeroSection() {
   const [activeLang, setActiveLang] = useState<'English' | 'Telugu' | 'Hindi'>('English')
+  const [isInboundModalOpen, setIsInboundModalOpen] = useState(false)
 
   return (
     <section className="hero-section relative" style={{ zIndex: 2 }}>
@@ -90,71 +85,14 @@ export default function HeroSection({ voiceState, onConnect, onDisconnect }: Her
                 <ArrowRight size={16} />
               </button>
 
-              {/* Voice demo button — state-driven */}
-              {voiceState === 'idle' && (
-                <button
-                  className="btn-secondary font-mono text-sm"
-                  onClick={onConnect}
-                >
-                  Watch it take a call
-                </button>
-              )}
-              {voiceState === 'connecting' && (
-                <button
-                  className="btn-secondary font-mono text-sm"
-                  disabled
-                  style={{ opacity: 0.5, cursor: 'not-allowed' }}
-                >
-                  <span
-                    style={{
-                      display: 'inline-block',
-                      width: 6,
-                      height: 6,
-                      borderRadius: '50%',
-                      background: 'var(--accent-glow)',
-                      animation: 'pulse 1s ease-in-out infinite',
-                      marginRight: 6,
-                    }}
-                  />
-                  Connecting...
-                </button>
-              )}
-              {voiceState === 'connected' && (
-                <button
-                  className="btn-secondary font-mono text-sm"
-                  onClick={onDisconnect}
-                  style={{
-                    borderColor: '#e05252',
-                    color: '#e05252',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 6,
-                  }}
-                >
-                  <span
-                    style={{
-                      width: 7,
-                      height: 7,
-                      borderRadius: '50%',
-                      background: '#e05252',
-                      display: 'inline-block',
-                      animation: 'pulse 1.2s ease-in-out infinite',
-                    }}
-                  />
-                  On Call
-                  <PhoneOff size={13} style={{ marginLeft: 2 }} />
-                  End Call
-                </button>
-              )}
-              {voiceState === 'error' && (
-                <button
-                  className="btn-secondary font-mono text-sm"
-                  onClick={onConnect}
-                  style={{ borderColor: '#e05252', color: '#e05252' }}
-                >
-                  Failed. Try again
-                </button>
-              )}
+              {/* Inbound Call Demo Button */}
+              <button
+                className="btn-secondary font-mono text-sm inline-flex items-center gap-2"
+                onClick={() => setIsInboundModalOpen(true)}
+              >
+                <PhoneCall size={14} className="text-indigo-400" />
+                Watch it take a call
+              </button>
             </div>
 
             {/* Trust badges */}
@@ -218,6 +156,12 @@ export default function HeroSection({ voiceState, onConnect, onDisconnect }: Her
           <div className="hidden lg:block" />
         </div>
       </div>
+
+      {/* Inbound Live Call Modal */}
+      <InboundCallModal
+        isOpen={isInboundModalOpen}
+        onClose={() => setIsInboundModalOpen(false)}
+      />
     </section>
   )
 }

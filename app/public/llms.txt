@@ -1,0 +1,19 @@
+# Wakilz AI Voice Agent
+
+> Wakilz is an AI voice agent platform built for real estate. It automates 24/7 inbound phone lead qualification, instant CRM synchronization, and site visit appointment scheduling in English, Hindi, and Telugu with sub-second latency.
+
+## Core Capabilities
+- [AI Real Estate ISA](https://wakilz.com/ai-isa-real-estate): 24/7 automated qualification of inbound phone callers and ad leads.
+- [Multilingual Real Estate Voice Agent](https://wakilz.com/multilingual-voice-agent): Fluent voice interactions across English, Hindi, and Telugu with native regional accents.
+- [Luxury Real Estate Voice Agent](https://wakilz.com/ai-voice-agent-luxury-real-estate): High-touch qualification for luxury developments and HNIs.
+- [Wakilz vs Human ISA](https://wakilz.com/wakilz-vs-human-isa): Performance, response speed under 30 seconds, and ROI comparison.
+- [Conversations & Call Logs](https://wakilz.com/conversations): Real call audio recordings, transcripts, and lead intent extraction.
+
+## Solutions & Platform
+- [Live Interactive Portal](https://wakilz.com/): Real-time browser voice call demo powered by WebRTC and Google Cloud Run voice engine.
+- [CRM Integrations](https://wakilz.com/): Instant webhooks and two-way sync with Salesforce, HubSpot, LeadSquared, Google Sheets, and WhatsApp.
+
+## Organization & Contact
+- [Official Website](https://wakilz.com/): Homepage, live demo, and service booking.
+- [Founder & Engineering](https://www.linkedin.com/in/muzammil-mohammed-ai/): Muzammil Mohammed on LinkedIn.
+

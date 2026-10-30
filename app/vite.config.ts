@@ -16,6 +16,24 @@ export default defineConfig({
       dynamicRoutes: ['/conversations', '/ai-isa-real-estate', '/multilingual-voice-agent', '/wakilz-vs-human-isa', '/ai-voice-agent-luxury-real-estate']
     })
   ],
+  build: {
+    chunkSizeWarningLimit: 800,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/three') || id.includes('@react-three')) {
+            return 'three-vendor'
+          }
+          if (id.includes('node_modules/firebase')) {
+            return 'firebase-vendor'
+          }
+          if (id.includes('node_modules/recharts') || id.includes('node_modules/d3')) {
+            return 'recharts-vendor'
+          }
+        }
+      }
+    }
+  },
   server: {
     port: 3000,
     proxy: {
