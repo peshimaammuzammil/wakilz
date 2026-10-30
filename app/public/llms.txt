@@ -10,7 +10,7 @@
 - [Conversations & Call Logs](https://wakilz.com/conversations): Real call audio recordings, transcripts, and lead intent extraction.
 
 ## Solutions & Platform
-- [Live Interactive Portal](https://wakilz.com/): Real-time browser voice call demo powered by WebRTC and Google Cloud Run voice engine.
+- [Live Inbound Bot Demonstration](https://wakilz.com/): Instant direct inbound phone call demo to +91 94920 60792 powered by Google Cloud Run voice engine.
 - [CRM Integrations](https://wakilz.com/): Instant webhooks and two-way sync with Salesforce, HubSpot, LeadSquared, Google Sheets, and WhatsApp.
 
 ## Organization & Contact

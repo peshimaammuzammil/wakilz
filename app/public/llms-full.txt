@@ -6,7 +6,7 @@
 - Latency: Sub-second voice response time (< 800ms time-to-first-audio)
 - Supported Languages: English, Hindi, and Telugu with natural conversational flow and code-switching
 - Cloud Architecture: High-availability Google Cloud Run backend (`wakilz-voice`) in asia-south1, with Firebase Global CDN edge delivery
-- Voice Engine: Real-time full-duplex WebRTC audio streaming, neural speech recognition, and low-latency text-to-speech
+- Telephony & Voice Engine: Real-time full-duplex conversational telephony pipeline, neural speech recognition, low-latency text-to-speech, and direct phone inbound routing (+91 94920 60792)
 - Integrations: Webhooks, REST API, Salesforce, HubSpot, Google Sheets, WhatsApp Business API
 
 ## Solutions
